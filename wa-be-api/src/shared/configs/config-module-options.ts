@@ -29,7 +29,7 @@ export const configModuleOptions: ConfigModuleOptions = {
     EMAIL_USER: Joi.string().required(),
     EMAIL_PASSWORD: Joi.string().required(),
     EMAIL_FORGOT_PASSWORD_URL: Joi.string().required(),
-    SSO_LOGIN_URL: Joi.string().required(),
-    FE_URL: Joi.string().required(),
+    AUTH_BASIC_PASSWORD: Joi.string().required(),
+    WORKER_DIR: Joi.string().required(),
   }),
 };

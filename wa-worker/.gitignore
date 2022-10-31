@@ -6,3 +6,4 @@ dbs/*
 *.DS_Store
 !*.gitkeep
 cmd/main/main
+cmd/62*/

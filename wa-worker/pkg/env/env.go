@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"wa-worker/pkg/log"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -25,8 +26,10 @@ func SanitizeEnv(envName string) (string, error) {
 func GetEnvString(envName string) (string, error) {
 	envValue, err := SanitizeEnv(envName)
 	if err != nil {
+		log.Print(nil).Info("env not found : " + envName)
 		return "", err
 	}
+	log.Print(nil).Info("env found : " + envName + " : " + envValue)
 
 	return envValue, nil
 }

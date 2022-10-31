@@ -1,0 +1,5 @@
+export enum WHATSAPP_MESSAGE_QUEUE_STATUS {
+  SENT = 'SENT',
+  ONQUEUE = 'ONQUEUE',
+  FAILED = 'FAILED',
+}

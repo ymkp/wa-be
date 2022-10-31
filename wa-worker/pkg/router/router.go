@@ -11,10 +11,11 @@ var CacheCapacity, CacheTTLSeconds int
 func init() {
 	var err error
 
-	BaseURL, err = env.GetEnvString("HTTP_BASE_URL")
-	if err != nil {
-		BaseURL = "/"
-	}
+	// BaseURL, err = env.GetEnvString("HTTP_BASE_URL")
+	// if err != nil {
+	// 	BaseURL = "/"
+	// }
+	BaseURL = "/api/v1/whatsapp"
 
 	CORSOrigin, err = env.GetEnvString("HTTP_CORS_ORIGIN")
 	if err != nil {

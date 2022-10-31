@@ -1,11 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
 import { CustomRepository } from 'src/shared/decorators/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
-import { WhatsappClient } from '../entities/whatsapp-client.entity';
+import { WhatsappMessageContent } from '../entities/whatsapp-message-content.entity';
 
-@CustomRepository(WhatsappClient)
-export class WhatsappClientRepository extends Repository<WhatsappClient> {
-  async getById(id: number): Promise<WhatsappClient> {
+@CustomRepository(WhatsappMessageContent)
+export class WhatsappMessageContentRepository extends Repository<WhatsappMessageContent> {
+  async getById(id: number): Promise<WhatsappMessageContent> {
     const data = await this.findOne({ where: { id } });
     if (!data) throw new NotFoundException();
     return data;

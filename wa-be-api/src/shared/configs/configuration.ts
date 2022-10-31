@@ -38,6 +38,6 @@ export default (): any => ({
   },
   defaultAdminUserPassword: process.env.DEFAULT_ADMIN_USER_PASSWORD,
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
-  ssoLoginURL: process.env.SSO_LOGIN_URL,
-  feURL: process.env.FE_URL,
+  authBasicPassword: process.env.AUTH_BASIC_PASSWORD,
+  waWorkerDir: process.env.WORKER_DIR,
 });

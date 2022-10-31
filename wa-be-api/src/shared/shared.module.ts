@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { configModuleOptions } from './configs/module-options';
+import { configModuleOptions } from './configs/config-module-options';
 import { EmailModule } from './email';
 
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';

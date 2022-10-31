@@ -56,6 +56,8 @@ func (ev *EchoValidator) Validate(i interface{}) error {
 func main() {
 	var err error
 
+	// env.Init()
+
 	// Intialize Cron
 	c := cron.New(cron.WithChain(
 		cron.Recover(cron.DiscardLogger),
@@ -124,10 +126,11 @@ func main() {
 	// Get Server Configuration
 	var serverConfig Server
 
-	serverConfig.Address, err = env.GetEnvString("SERVER_ADDRESS")
-	if err != nil {
-		serverConfig.Address = "127.0.0.1"
-	}
+	// serverConfig.Address, err = env.GetEnvString("SERVER_ADDRESS")
+	// if err != nil {
+	// 	serverConfig.Address = "127.0.0.1"
+	// }
+	serverConfig.Address = "127.0.0.1"
 
 	serverConfig.Port, err = env.GetEnvString("SERVER_PORT")
 	if err != nil {
