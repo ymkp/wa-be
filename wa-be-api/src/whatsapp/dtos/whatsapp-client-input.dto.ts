@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class WhatsappClientInputRegister {
   @ApiProperty()
@@ -17,4 +17,32 @@ export interface WhatsappWorkerCreateParameter {
   serverPort: number;
   authBasicUsername: string;
   authBasicPassword: string;
+}
+
+export interface WhatsappClientEntityInterface {
+  id: number;
+  msisdn: string;
+  secret: string;
+}
+
+export class WhatsappClientEntityInput {
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  id: number;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  name: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  msisdn: string;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  port: string;
 }

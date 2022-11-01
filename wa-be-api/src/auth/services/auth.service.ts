@@ -109,9 +109,6 @@ export class AuthService {
     const payload = {
       username: user.username,
       sub: user.id,
-      divisiId: user.divisiId,
-      bagianId: user.bagianId,
-      isSuperAdmin: user.isSuperAdmin,
     };
     const authToken = {
       refreshToken: this.jwtService.sign(subject, {
@@ -259,10 +256,8 @@ export class AuthService {
         url: '',
         user: {
           id: user.id,
-          bagianId: 0,
-          divisiId: 0,
-          isSuperAdmin: false,
           username: '',
+          other: '',
         },
       },
       { password },

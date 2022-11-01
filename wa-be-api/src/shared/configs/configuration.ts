@@ -40,4 +40,5 @@ export default (): any => ({
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
   authBasicPassword: process.env.AUTH_BASIC_PASSWORD,
   waWorkerDir: process.env.WORKER_DIR,
+  waWorkerUrl: process.env.WORKER_URL,
 });

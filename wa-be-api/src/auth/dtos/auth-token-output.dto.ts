@@ -1,8 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
-import { ROLE } from '../constants/role.constant';
-
 export class AuthTokenOutput {
   @Expose()
   @ApiProperty()
@@ -21,13 +19,10 @@ export class UserAccessTokenClaims {
   username: string;
 
   @Expose()
-  divisiId: number;
+  other?: string;
 
   @Expose()
-  bagianId: number;
-
-  @Expose()
-  isSuperAdmin: boolean;
+  type?: string;
 }
 
 export class UserRefreshTokenClaims {

@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constants';
@@ -15,6 +16,7 @@ export class WhatsappClient {
   @Column()
   name: string;
 
+  @Unique('msisdn', ['msisdn'])
   @Column({ length: 18 })
   msisdn: string;
 
