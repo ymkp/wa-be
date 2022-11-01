@@ -44,5 +44,5 @@ export class WhatsappClientEntityInput {
   @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
-  port: string;
+  port: number;
 }

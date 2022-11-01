@@ -1,11 +1,4 @@
-import {
-  CACHE_MANAGER,
-  Inject,
-  Injectable,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import {
   WhatsappClientEntityInput,
   WhatsappClientEntityInterface,
@@ -17,22 +10,26 @@ import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as util from 'util';
 import { AuthTokenOutput } from 'src/auth/dtos/auth-token-output.dto';
-import { plainToInstance } from 'class-transformer';
 import { JwtService } from '@nestjs/jwt';
 import { WhatsappClient } from '../entities/whatsapp-client.entity';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { WA_WORKER_AUTH } from '../constants/whatsapp-client-url.constants';
+import {
+  WA_WORKER_AUTH,
+  WA_WORKER_LOGIN,
+} from '../constants/whatsapp-client-url.constants';
+import { WhatsappWorkerResponseDTO } from '../dtos/whatsapp-worker.dto';
+import { WhatsappCacheService } from './whatsapp-cache.service';
 const execAsync = util.promisify(require('child_process').exec);
 
 @Injectable()
 export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly configService: ConfigService,
-    private readonly waClientRepo: WhatsappClientRepository,
+    private readonly clientRepo: WhatsappClientRepository,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly cacheService: WhatsappCacheService,
   ) {
     this.workerURL = this.configService.get('waWorkerUrl');
   }
@@ -49,10 +46,24 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
 
   private async onInit() {
     console.log('WAClient Service onInit called');
-    // TODO : implementation
-    // ? 1 . load all clients
-    // ? 1.1 - build all client with new credential
-    // ? 1.2 - login all client with new credential
+    const clients = await this.clientRepo.find();
+    if (clients.length > 0) {
+      for (let i = 0; i < clients.length; i++) {
+        console.log('init : ', clients[i].msisdn);
+        await this.buildWAClientFromWorker({
+          authBasicPassword: clients[i].secret,
+          authBasicUsername: clients[i].msisdn,
+          serverPort: clients[i].port,
+        });
+      }
+      console.log('wait 9 secs');
+      await new Promise((r) => setTimeout(r, 9000));
+      for (let i = 0; i < clients.length; i++) {
+        await this.loginAWorkerPrivate(clients[i]);
+      }
+    } else {
+      console.log('there is no registered clients');
+    }
   }
 
   private async onDestroy() {
@@ -64,19 +75,19 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
   }
 
   public async getClientById(id: number): Promise<WhatsappClient> {
-    return await this.waClientRepo.getById(id);
+    return await this.clientRepo.getById(id);
   }
 
   public async createWAClient(
     body: WhatsappClientInputRegister,
   ): Promise<void> {
     const secret = this.configService.get('authBasicPassword');
-    const last = await this.waClientRepo.find({
+    const last = await this.clientRepo.find({
       order: { id: 'DESC' },
       take: 1,
     });
 
-    const client = await this.waClientRepo.save({
+    const client = await this.clientRepo.save({
       msisdn: body.msisdn,
       name: body.name,
       secret,
@@ -89,32 +100,17 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  public async loginWAWorker(body: WhatsappClientEntityInput): Promise<void> {
-    const c = await this.waClientRepo.getById(body.id);
-    console.log(c.msisdn);
-    const url = `${this.workerURL}:${c.port}`;
-    console.log(`${url}${WA_WORKER_AUTH}`);
-
-    const res = await firstValueFrom(
-      this.httpService.get(`${url}${WA_WORKER_AUTH}`, {
-        auth: { username: c.msisdn, password: c.secret },
-      }),
-    );
-    console.log(res.data);
+  public async loginWAWorkerPublic(
+    body: WhatsappClientEntityInput,
+  ): Promise<void> {
+    const c = await this.clientRepo.getById(body.id);
+    await this.loginAWorkerPrivate(c);
   }
-
-  // public async testCopy() {
-  //   await this.buildWAClientFromWorker({
-  //     authBasicUsername: '6281381782310',
-  //     authBasicPassword: '83e4060e-78e1-4fe5-9977-aeeccd46a2b8',
-  //     serverPort: 3000,
-  //   });
-  // }
 
   public async generateToken(
     input: WhatsappClientEntityInput,
   ): Promise<AuthTokenOutput> {
-    const client = await this.waClientRepo.findOneOrFail({
+    const client = await this.clientRepo.findOneOrFail({
       where: { id: input.id },
     });
     return this.generateTokenWorker({
@@ -124,17 +120,60 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  public async testCopy2() {
-    const workerDir = this.configService.get('waWorkerDir');
+  public async generateQRLogin(input: WhatsappClientEntityInput): Promise<any> {
+    const c = await this.cacheService.getTokenFromClientInput(input);
+    const url = `${this.workerURL}:${c.port}`;
 
-    const pm2JsonContent = this.buildPM2Json({
-      authBasicUsername: '6281381782310',
-      authBasicPassword: '83e4060e-78e1-4fe5-9977-aeeccd46a2b8',
-      serverPort: 3000,
-    });
-    await execAsync(
-      `echo "${pm2JsonContent}" > ${workerDir}/cmd/6281381782310/run.json`,
-    );
+    try {
+      const res = await firstValueFrom(
+        this.httpService.post<any>(
+          `${url}${WA_WORKER_LOGIN}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${c.token}`,
+            },
+          },
+        ),
+      );
+      return res.data;
+    } catch (err) {
+      console.log('failed to get QR login : ');
+      return '';
+    }
+  }
+
+  // ? ----------------------------PRIVATES
+
+  private async loginAWorkerPrivate(client: WhatsappClient): Promise<void> {
+    const url = `${this.workerURL}:${client.port}`;
+    try {
+      console.log(`try : ${url}${WA_WORKER_AUTH}`);
+      const res = await firstValueFrom(
+        this.httpService.get<WhatsappWorkerResponseDTO<{ token: string }>>(
+          `${url}${WA_WORKER_AUTH}`,
+          {
+            auth: { username: client.msisdn, password: client.secret },
+          },
+        ),
+      );
+      try {
+        await this.cacheService.saveTokenForMSISDN(
+          client.msisdn,
+          res.data.data.token,
+          client.port,
+        );
+      } catch (err) {
+        console.log(
+          'failed to save to cache : token-',
+          client.msisdn,
+          ' : ',
+          err,
+        );
+      }
+    } catch (err) {
+      console.log('failed to login : ');
+    }
   }
 
   private async buildWAClientFromWorker(input: WhatsappWorkerCreateParameter) {

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,6 +12,7 @@ import { AppLoggerModule } from './logger/logger.module';
 @Module({
   imports: [
     ConfigModule.forRoot(configModuleOptions),
+    CacheModule.register({ ttl: 0 }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -33,7 +34,7 @@ import { AppLoggerModule } from './logger/logger.module';
     AppLoggerModule,
     EmailModule,
   ],
-  exports: [AppLoggerModule, ConfigModule, EmailModule],
+  exports: [AppLoggerModule, ConfigModule, EmailModule, CacheModule],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
 

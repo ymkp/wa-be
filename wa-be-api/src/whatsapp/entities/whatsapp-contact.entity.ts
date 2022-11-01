@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -11,6 +12,7 @@ export class WhatsappContact {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Unique('msisdn', ['msisdn'])
   @Column({ length: 18 })
   msisdn: string;
 

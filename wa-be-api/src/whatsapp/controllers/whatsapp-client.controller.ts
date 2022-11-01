@@ -18,18 +18,10 @@ import { WhatsappCLientService } from '../services/whatsapp-client.service';
 
 @ApiTags('whatsapp-client')
 @Controller('whatsapp-client')
-// @UseGuards(JwtAuthGuard)
-// @ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class WhatsappClientController {
   constructor(private readonly waClientService: WhatsappCLientService) {}
-
-  // @Get('tessttt')
-  // @ApiOperation({
-  //   summary: 'test',
-  // })
-  // async testsss(): Promise<void> {
-  //   await this.waClientService.testCopy();
-  // }
 
   @Get('')
   @ApiOperation({
@@ -60,7 +52,17 @@ export class WhatsappClientController {
     summary: 'login to client',
   })
   async loginWorker(@Body() body: WhatsappClientEntityInput): Promise<void> {
-    await this.waClientService.loginWAWorker(body);
+    await this.waClientService.loginWAWorkerPublic(body);
+  }
+
+  @Post('worker/qr')
+  @ApiOperation({
+    summary: 'generate qr image',
+  })
+  async generateQRRegister(
+    @Body() body: WhatsappClientEntityInput,
+  ): Promise<any> {
+    return await this.waClientService.generateQRLogin(body);
   }
 
   @Delete('/:id')
