@@ -15,13 +15,13 @@ export class WhatsappMessageOutputDTOMini {
 
   @Expose()
   @ApiProperty()
-  @Transform(({ value }) => value.msisdn ?? '', { toClassOnly: true })
+  @Transform(({ value }) => value?.msisdn ?? '', { toClassOnly: true })
   contact: string;
 
   @Expose()
   @ApiProperty()
   @Transform(
-    ({ value }) => (value.content ? value.content.substring(0, 50) : ''),
+    ({ value }) => (value?.content ? value?.content.substring(0, 50) : ''),
     { toClassOnly: true },
   )
   content: string;

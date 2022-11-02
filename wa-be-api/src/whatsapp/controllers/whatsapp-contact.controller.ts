@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
@@ -19,8 +19,8 @@ export class WhatsappContactController {
     summary: 'get list of WA contacts registered on the system',
   })
   async getContacts(
-    @Param() paginationQ: PaginationParamsDto,
-    @Param() filterQ: WhatsappContactFilterInput,
+    @Query() paginationQ: PaginationParamsDto,
+    @Query() filterQ: WhatsappContactFilterInput,
   ): Promise<BaseApiResponse<WhatsappContactOutputDTO[]>> {
     return await this.contactService.getContactsWithPagination(
       paginationQ,

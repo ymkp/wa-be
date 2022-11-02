@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -33,8 +34,8 @@ export class WhatsappMessageController {
     summary: 'get list of WA messages registered on the system',
   })
   async getMessages(
-    @Param() paginationQ: PaginationParamsDto,
-    @Param() filterQ: WhatsappMessageFilterInput,
+    @Query() paginationQ: PaginationParamsDto,
+    @Query() filterQ: WhatsappMessageFilterInput,
   ): Promise<BaseApiResponse<WhatsappMessageOutputDTOMini[]>> {
     return await this.service.getMessageWithPagination(paginationQ, filterQ);
   }

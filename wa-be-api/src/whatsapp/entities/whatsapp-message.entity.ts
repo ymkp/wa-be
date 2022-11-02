@@ -28,7 +28,7 @@ export class WhatsappMessage {
   @Column()
   clientId: number;
 
-  @ManyToOne(() => WhatsappContact, { nullable: true })
+  @ManyToOne(() => WhatsappContact, { nullable: true, eager: true })
   @JoinColumn()
   contact: WhatsappContact;
 

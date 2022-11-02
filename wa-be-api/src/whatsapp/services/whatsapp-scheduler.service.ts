@@ -9,6 +9,7 @@ import { WhatsappWorkerResponseDTO } from '../dtos/whatsapp-worker.dto';
 import { WhatsappMessage } from '../entities/whatsapp-message.entity';
 import { WhatsappMessageRepository } from '../repositories/whatsapp-message.entity';
 import { WhatsappCacheService } from './whatsapp-cache.service';
+import { WhatsappCLientService } from './whatsapp-client.service';
 var FormData = require('form-data');
 
 @Injectable()
@@ -17,11 +18,17 @@ export class WHatsappSchedulerService {
     private readonly messageRepo: WhatsappMessageRepository,
     private readonly httpService: HttpService,
     private readonly cacheService: WhatsappCacheService,
+    private readonly clientService: WhatsappCLientService,
   ) {}
 
   onQueueMsg: WhatsappMessage[] = [];
   onProgressMsg: WhatsappMessage[] = [];
   failedMsgs: WhatsappMessage[] = [];
+
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  private async checkWorkerStatusCRON() {
+    this.checkAllWorkerStatus();
+  }
 
   @Cron(CronExpression.EVERY_30_SECONDS, {
     name: 'cron-check-queue',
@@ -45,6 +52,10 @@ export class WHatsappSchedulerService {
     } else {
       console.log('there is still process ongoing');
     }
+  }
+
+  private async checkAllWorkerStatus(): Promise<void> {
+    this.clientService.checkAndUpdateAllClientStatus();
   }
 
   private async transferFirst40OnQueueMsgs() {

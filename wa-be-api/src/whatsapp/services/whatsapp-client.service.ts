@@ -1,8 +1,15 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import {
   WhatsappClientEntityInput,
   WhatsappClientEntityInterface,
+  WhatsappClientIdInput,
   WhatsappClientInputRegister,
+  WhatsappClientQRGenerateInput,
   WhatsappWorkerCreateParameter,
 } from '../dtos/whatsapp-client-input.dto';
 import { WhatsappClientRepository } from '../repositories/whatsapp-client.repository';
@@ -17,10 +24,18 @@ import { firstValueFrom } from 'rxjs';
 import {
   WA_WORKER_AUTH,
   WA_WORKER_LOGIN,
+  WA_WORKER_STATUS,
 } from '../constants/whatsapp-client-url.constants';
 import { WhatsappWorkerResponseDTO } from '../dtos/whatsapp-worker.dto';
 import { WhatsappCacheService } from './whatsapp-cache.service';
+import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constants';
+import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
+import { FindManyOptions } from 'typeorm';
+import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
+import { WhatsappClientOutputDTO } from '../dtos/whatsapp-client-output.dto';
+import { plainToInstance } from 'class-transformer';
 const execAsync = util.promisify(require('child_process').exec);
+var FormData = require('form-data');
 
 @Injectable()
 export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
@@ -62,6 +77,67 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  public async checkClientStatus(
+    id: number,
+    client?: WhatsappClient,
+  ): Promise<void> {
+    if (!client) {
+      client = await this.clientRepo.findOneOrFail({
+        where: { id },
+        select: ['id', 'msisdn'],
+      });
+    }
+    const c = await this.cacheService.getTokenFromClientId(id);
+    try {
+      const res = await firstValueFrom(
+        this.httpService.get<any>(`${c.fullUrl}${WA_WORKER_STATUS}`, {
+          params: {
+            msisdn: client.msisdn,
+          },
+          headers: {
+            Authorization: `Bearer ${c.token}`,
+          },
+        }),
+      );
+      console.log(res.data);
+      if (client.status != WHATSAPP_CLIENT_STATUS.ACTIVE) {
+        client.status = WHATSAPP_CLIENT_STATUS.ACTIVE;
+        await this.clientRepo.save(client);
+      }
+      return res.data;
+    } catch (err) {
+      console.log('failed to check client : ', err);
+      client.status = WHATSAPP_CLIENT_STATUS.ERROR;
+      await this.clientRepo.save(client);
+      throw new BadRequestException();
+    }
+  }
+
+  public async getClientsWithPagination(paginationQ: PaginationParamsDto) {
+    const options: FindManyOptions<WhatsappClient> = {
+      take: paginationQ.limit,
+      skip: (paginationQ.page - 1) * paginationQ.limit,
+      order: { id: 'DESC' },
+    };
+    const [res, count] = await this.clientRepo.findAndCount(options);
+    const meta: PaginationResponseDto = {
+      count,
+      page: paginationQ.page,
+      maxPage: Math.ceil(count / paginationQ.limit),
+    };
+    const data = plainToInstance(WhatsappClientOutputDTO, res);
+    return { data, meta };
+  }
+
+  public async checkAndUpdateAllClientStatus() {
+    const clients = await this.clientRepo.find({
+      select: ['id', 'msisdn'],
+    });
+    for (let i = 0; i < clients.length; i++) {
+      await this.checkClientStatus(clients[i].id, clients[i]);
+    }
+  }
+
   private async onDestroy() {
     console.log('WAClient Service onDestroy called');
     // TODO : iplementation
@@ -96,9 +172,7 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  public async loginWAWorkerPublic(
-    body: WhatsappClientEntityInput,
-  ): Promise<void> {
+  public async loginWAWorkerPublic(body: WhatsappClientIdInput): Promise<void> {
     const c = await this.clientRepo.getById(body.id);
     await this.loginAWorkerPrivate(c);
   }
@@ -116,14 +190,20 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  public async generateQRLogin(input: WhatsappClientEntityInput): Promise<any> {
-    const c = await this.cacheService.getTokenFromClientInput(input);
+  public async generateQRLogin(
+    input: WhatsappClientQRGenerateInput,
+  ): Promise<any> {
+    const c = await this.cacheService.getTokenFromClientId(input.id);
 
     try {
+      const bodyFormData = new FormData();
+      if (input.other && (input.other === 'json' || input.other === 'html')) {
+        bodyFormData.append('output', input.other);
+      }
       const res = await firstValueFrom(
         this.httpService.post<any>(
           `${c.fullUrl}${WA_WORKER_LOGIN}`,
-          {},
+          bodyFormData,
           {
             headers: {
               Authorization: `Bearer ${c.token}`,

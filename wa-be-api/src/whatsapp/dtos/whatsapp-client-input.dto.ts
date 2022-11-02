@@ -46,3 +46,22 @@ export class WhatsappClientEntityInput {
   @IsOptional()
   port: number;
 }
+
+export class WhatsappClientIdInput {
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  id: number;
+}
+
+export class WhatsappClientQRGenerateInput {
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  id: number;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  other: string;
+}

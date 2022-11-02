@@ -6,14 +6,20 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
+import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import {
   WhatsappClientEntityInput,
+  WhatsappClientIdInput,
   WhatsappClientInputRegister,
+  WhatsappClientQRGenerateInput,
 } from '../dtos/whatsapp-client-input.dto';
+import { WhatsappClientOutputDTO } from '../dtos/whatsapp-client-output.dto';
 import { WhatsappCLientService } from '../services/whatsapp-client.service';
 
 @ApiTags('whatsapp-client')
@@ -27,8 +33,10 @@ export class WhatsappClientController {
   @ApiOperation({
     summary: 'get list of WA clients registered on the system',
   })
-  async getClients() {
-    // TODO : implementation
+  async getClients(
+    @Query() paginationQ: PaginationParamsDto,
+  ): Promise<BaseApiResponse<WhatsappClientOutputDTO[]>> {
+    return await this.waClientService.getClientsWithPagination(paginationQ);
   }
 
   @Post('')
@@ -51,7 +59,7 @@ export class WhatsappClientController {
   @ApiOperation({
     summary: 'login to client',
   })
-  async loginWorker(@Body() body: WhatsappClientEntityInput): Promise<void> {
+  async loginWorker(@Body() body: WhatsappClientIdInput): Promise<void> {
     await this.waClientService.loginWAWorkerPublic(body);
   }
 
@@ -70,8 +78,13 @@ export class WhatsappClientController {
   }
 
   @Post('/qrcode/request')
-  @ApiOperation({ summary: 'request qr code for auth' })
-  async qrCodeRequest(@Body() body: WhatsappClientEntityInput): Promise<any> {
+  @ApiOperation({
+    summary:
+      'request qr code for auth.  fill "other" with "json" or "html"(default : html)',
+  })
+  async qrCodeRequest(
+    @Body() body: WhatsappClientQRGenerateInput,
+  ): Promise<any> {
     return await this.waClientService.generateQRLogin(body);
   }
 
@@ -83,7 +96,7 @@ export class WhatsappClientController {
 
   @Post('/status')
   @ApiOperation({ summary: 'NOT-YET-IMPLEMENTED check client status' })
-  async clientStatus(@Body() body: WhatsappClientEntityInput) {
-    // TODO : implementation
+  async clientStatus(@Body() body: WhatsappClientEntityInput): Promise<any> {
+    return await this.waClientService.checkClientStatus(body.id);
   }
 }
