@@ -29,13 +29,13 @@ async function bootstrap() {
   /** Swagger configuration*/
   const options = new DocumentBuilder()
     .setTitle('WA BE API')
-    .setDescription('API untuk API Whatsapp Divtik')
+    .setDescription('API untuk API WA & SMS Mimin Situspol')
     .setVersion('0.1')
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('swagger', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   const port = configService.get<number>('port');
   await app.listen(port);

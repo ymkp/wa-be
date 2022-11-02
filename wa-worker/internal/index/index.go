@@ -14,5 +14,5 @@ import (
 // @Success     200
 // @Router      /api/v1/whatsapp [get]
 func Index(c echo.Context) error {
-	return router.ResponseSuccess(c, "WA-Worker Multi-Device REST is running")
+	return router.ResponseSuccess(c, "Situspol WA Mimin - Dev is running")
 }

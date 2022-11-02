@@ -82,7 +82,7 @@ func Login(c echo.Context) error {
 		htmlContent := `
     <html>
       <head>
-        <title>WhatsApp Multi-Device Login</title>
+        <title>Situspol WA Mimin - Dev : QR Login</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
       </head>
       <body>

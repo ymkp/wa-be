@@ -58,7 +58,7 @@ func WhatsAppInitClient(device *store.Device, jid string) {
 		}
 
 		// Set Client Properties
-		store.DeviceProps.Os = proto.String("Go WhatsApp Multi-Device REST")
+		store.DeviceProps.Os = proto.String("Situspol WA Mimin - Dev")
 		store.DeviceProps.PlatformType = waproto.DeviceProps_DESKTOP.Enum()
 		store.DeviceProps.RequireFullSync = proto.Bool(false)
 
