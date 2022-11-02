@@ -17,3 +17,10 @@ export class CreateWhatsappMessageInput {
   @IsNotEmpty()
   contactMsisdn: string;
 }
+
+export class WhatsappMessageFilterInput {
+  @ApiPropertyOptional()
+  @IsNumber()
+  @IsOptional()
+  clientId: number;
+}

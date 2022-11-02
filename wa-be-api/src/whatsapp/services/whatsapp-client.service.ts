@@ -25,14 +25,12 @@ const execAsync = util.promisify(require('child_process').exec);
 @Injectable()
 export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
   constructor(
-    private readonly configService: ConfigService,
     private readonly clientRepo: WhatsappClientRepository,
+    private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
     private readonly cacheService: WhatsappCacheService,
-  ) {
-    this.workerURL = this.configService.get('waWorkerUrl');
-  }
+  ) {}
 
   onModuleInit() {
     this.onInit();
@@ -41,8 +39,6 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
   onModuleDestroy() {
     this.onDestroy();
   }
-
-  private workerURL: string;
 
   private async onInit() {
     console.log('WAClient Service onInit called');
@@ -122,12 +118,11 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
 
   public async generateQRLogin(input: WhatsappClientEntityInput): Promise<any> {
     const c = await this.cacheService.getTokenFromClientInput(input);
-    const url = `${this.workerURL}:${c.port}`;
 
     try {
       const res = await firstValueFrom(
         this.httpService.post<any>(
-          `${url}${WA_WORKER_LOGIN}`,
+          `${c.fullUrl}${WA_WORKER_LOGIN}`,
           {},
           {
             headers: {
@@ -146,7 +141,7 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
   // ? ----------------------------PRIVATES
 
   private async loginAWorkerPrivate(client: WhatsappClient): Promise<void> {
-    const url = `${this.workerURL}:${client.port}`;
+    const url = `${this.configService.get('waWorkerUrl')}:${client.port}`;
     try {
       console.log(`try : ${url}${WA_WORKER_AUTH}`);
       const res = await firstValueFrom(
@@ -159,6 +154,7 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
       );
       try {
         await this.cacheService.saveTokenForMSISDN(
+          client.id,
           client.msisdn,
           res.data.data.token,
           client.port,

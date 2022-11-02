@@ -18,7 +18,7 @@ export class WhatsappMessage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true, default: null })
   messageId: string;
 
   @ManyToOne(() => WhatsappClient)

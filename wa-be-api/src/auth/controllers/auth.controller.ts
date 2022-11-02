@@ -49,16 +49,6 @@ import { AuthService } from '../services/auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // TODO : auth/refresh
-
-  @Get('test-email/:email')
-  @ApiOperation({
-    summary: 'test email',
-  })
-  public async testEmail(@Param('email') email: string): Promise<void> {
-    await this.authService.testEMAIL(email);
-  }
-
   @Post('login')
   @ApiOperation({
     summary: 'User login API',

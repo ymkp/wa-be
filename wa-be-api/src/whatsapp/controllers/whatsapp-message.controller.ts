@@ -9,29 +9,44 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { CreateWhatsappMessageInput } from '../dtos/whatsapp-message-input.dto';
+import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
+import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
+import {
+  CreateWhatsappMessageInput,
+  WhatsappMessageFilterInput,
+} from '../dtos/whatsapp-message-input.dto';
+import {
+  WhatsappMessageOutputDTO,
+  WhatsappMessageOutputDTOMini,
+} from '../dtos/whatsapp-message-output.dto';
+import { WhatsappMessageService } from '../services/whatsapp-message.service';
 
 @ApiTags('whatsapp-message')
 @Controller('whatsapp-message')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class WhatsappMessageController {
-  constructor() {}
+  constructor(private readonly service: WhatsappMessageService) {}
 
-  @Get('')
+  @Get('/get')
   @ApiOperation({
     summary: 'get list of WA messages registered on the system',
   })
-  async getMessages() {
-    // TODO : implementation
+  async getMessages(
+    @Param() paginationQ: PaginationParamsDto,
+    @Param() filterQ: WhatsappMessageFilterInput,
+  ): Promise<BaseApiResponse<WhatsappMessageOutputDTOMini[]>> {
+    return await this.service.getMessageWithPagination(paginationQ, filterQ);
   }
 
-  @Post('/new')
+  @Post('/new/text')
   @ApiOperation({
-    summary: 'create a new WA message, sends it to queue',
+    summary: 'create a new text WA message, sends it to queue',
   })
-  async sendsAMessage(@Body() body: CreateWhatsappMessageInput) {
-    // TODO : implementation
+  async sendsAMessage(
+    @Body() body: CreateWhatsappMessageInput,
+  ): Promise<WhatsappMessageOutputDTO> {
+    return await this.service.addTextMessage(body);
   }
 
   @Get('/queue')
@@ -39,22 +54,16 @@ export class WhatsappMessageController {
     summary: 'get list of WA messages still on queues',
   })
   async getQueuedMessages() {
-    // TODO : implementation
-  }
-
-  @Get('/client/:id')
-  @ApiOperation({
-    summary: 'get WA messages by client id',
-  })
-  async getMessagesByClientId() {
-    // TODO : implementation
+    this.service.getQueueMessage();
   }
 
   @Get('/detail/:id')
   @ApiOperation({
     summary: 'get WA message detail',
   })
-  async getMessageDetail(@Param('id') id: number) {
-    // TODO : implementation
+  async getMessageDetail(
+    @Param('id') id: number,
+  ): Promise<WhatsappMessageOutputDTO> {
+    return await this.service.getMessageDetail(id);
   }
 }

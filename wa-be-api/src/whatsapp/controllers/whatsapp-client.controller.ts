@@ -42,7 +42,7 @@ export class WhatsappClientController {
   }
 
   @Patch('')
-  @ApiOperation({ summary: 'edit a WA client' })
+  @ApiOperation({ summary: 'NOT-YET-IMPLEMENTED edit a WA client' })
   async editAClient(@Body() body: WhatsappClientEntityInput) {
     // TODO : implementation
   }
@@ -55,18 +55,8 @@ export class WhatsappClientController {
     await this.waClientService.loginWAWorkerPublic(body);
   }
 
-  @Post('worker/qr')
-  @ApiOperation({
-    summary: 'generate qr image',
-  })
-  async generateQRRegister(
-    @Body() body: WhatsappClientEntityInput,
-  ): Promise<any> {
-    return await this.waClientService.generateQRLogin(body);
-  }
-
   @Delete('/:id')
-  @ApiOperation({ summary: 'soft delete a WA client' })
+  @ApiOperation({ summary: 'NOT-YET-IMPLEMENTED soft delete a WA client' })
   async freezeAClient() {
     // TODO : implementation
   }
@@ -81,18 +71,18 @@ export class WhatsappClientController {
 
   @Post('/qrcode/request')
   @ApiOperation({ summary: 'request qr code for auth' })
-  async qrCodeRequest(@Body() body: WhatsappClientEntityInput) {
-    // TODO : implementation
+  async qrCodeRequest(@Body() body: WhatsappClientEntityInput): Promise<any> {
+    return await this.waClientService.generateQRLogin(body);
   }
 
   @Post('/token/generate')
-  @ApiOperation({ summary: 'generate token for client' })
+  @ApiOperation({ summary: 'NOT-YET-IMPLEMENTED generate token for client' })
   async tokenGenerate(@Body() body: WhatsappClientEntityInput) {
     // TODO : implementation
   }
 
   @Post('/status')
-  @ApiOperation({ summary: 'check client status' })
+  @ApiOperation({ summary: 'NOT-YET-IMPLEMENTED check client status' })
   async clientStatus(@Body() body: WhatsappClientEntityInput) {
     // TODO : implementation
   }

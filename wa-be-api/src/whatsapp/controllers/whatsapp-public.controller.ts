@@ -15,7 +15,7 @@ export class WhatsappPublicController {
 
   @Post('/send')
   @ApiOperation({
-    summary: 'send a message',
+    summary: 'NOT-YET-IMPLEMENTED send a message with public header',
   })
   public async sendMessage(
     @ReqContext() ctx: RequestContext,
