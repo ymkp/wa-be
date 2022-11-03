@@ -17,6 +17,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { AuthTokenOutput } from 'src/auth/dtos/auth-token-output.dto';
 import { SuperAdminGuard } from 'src/auth/guards/superadmin.guard';
 import { IdValNumberDTO } from 'src/shared/dtos/id-value-response.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -152,5 +153,25 @@ export class UserController {
     @Body() input: UserEditPasswordBody,
   ): Promise<void> {
     await this.userService.editPassword(ctx, input);
+  }
+
+  @Get('token/generate-for-me')
+  @ApiOperation({ summary: 'generate user for logged in user' })
+  async generateWATokenForSelf(
+    @ReqContext() ctx: RequestContext,
+  ): Promise<AuthTokenOutput> {
+    return await this.userService.generateWATokenForUser(ctx.user.id);
+  }
+
+  @Get('token/generate-for-other/:userId')
+  @ApiOperation({
+    summary:
+      'generate user token for other users. Only superadmin can do this operation',
+  })
+  @UseGuards(SuperAdminGuard)
+  async generateWATokenForOtherUser(
+    @Param('userId') userId: number,
+  ): Promise<AuthTokenOutput> {
+    return await this.userService.generateWATokenForUser(userId);
   }
 }

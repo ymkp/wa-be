@@ -4,7 +4,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { plainToInstance } from 'class-transformer';
 import { EmailService } from 'src/shared/email';
 import { compare, hash } from 'bcrypt';
@@ -18,12 +17,14 @@ import {
   UserAccessTokenClaims,
 } from '../dtos/auth-token-output.dto';
 import { SSOService } from 'src/user/services/sso.service';
+import { WhatsappClientEntityInterface } from 'src/whatsapp/dtos/whatsapp-client-input.dto';
+import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+    private readonly signService: JwtSigningService,
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
     private readonly ssoService: SSOService,
@@ -111,10 +112,10 @@ export class AuthService {
       sub: user.id,
     };
     const authToken = {
-      refreshToken: this.jwtService.sign(subject, {
+      refreshToken: this.signService.signPayload(subject, {
         expiresIn: this.configService.get('jwt.refreshTokenExpiresInSec'),
       }),
-      accessToken: this.jwtService.sign(
+      accessToken: this.signService.signPayload(
         { ...payload, ...subject },
         {
           expiresIn: this.configService.get('jwt.accessTokenExpiresInSec'),
@@ -135,7 +136,7 @@ export class AuthService {
     const expiresIn =
       this.configService.get('jwt.refreshTokenExpiresInSec') / 10;
     const subject = { sub: user.username };
-    let ssoToken = this.jwtService.sign(subject, {
+    let ssoToken = this.signService.signPayload(subject, {
       expiresIn,
     });
     const tokenToSave = await hash(ssoToken, 10);
@@ -175,7 +176,7 @@ export class AuthService {
   private async sendSetPasswordEmail(email: string): Promise<void> {
     try {
       const payload = { email };
-      const token = this.jwtService.sign(payload, {
+      const token = this.signService.signPayload(payload, {
         expiresIn: this.configService.get('jwt.refreshTokenExpiresInSec'),
       });
       const forgotPasswordURL = this.configService.get(
@@ -199,7 +200,7 @@ export class AuthService {
     try {
       const user = await this.userService.getUserByEmail(email);
       const payload = { email };
-      const token = this.jwtService.sign(payload, {
+      const token = this.signService.signPayload(payload, {
         expiresIn: this.configService.get('jwt.refreshTokenExpiresInSec'),
       });
       const forgotPasswordURL = this.configService.get(
@@ -234,7 +235,7 @@ export class AuthService {
 
   public async decodeConfirmationToken(token: string) {
     try {
-      const payload = await this.jwtService.verify(token, {});
+      const payload = await this.signService.verifyToken(token, {});
       if (typeof payload === 'object' && 'email' in payload) {
         return payload.email;
       }

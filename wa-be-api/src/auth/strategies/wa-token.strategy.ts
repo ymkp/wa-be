@@ -33,6 +33,8 @@ export class WAClientTokenStrategy extends PassportStrategy(
         id: payload.sub,
         username: payload.username,
         other: payload.other,
+        type: payload.type,
+        terumbuKarang: payload.terumbuKarang,
       };
     } else {
       throw new BadRequestException('Token tidak valid');

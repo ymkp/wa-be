@@ -1,3 +1,4 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -41,6 +42,13 @@ export class WhatsappMessage {
 
   @Column()
   contentId: number;
+
+  @ManyToOne(() => User)
+  @JoinColumn()
+  createdBy: User;
+
+  @Column()
+  createdById: number;
 
   @Column({
     type: 'enum',

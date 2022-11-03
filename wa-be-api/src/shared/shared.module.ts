@@ -1,6 +1,7 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { configModuleOptions } from './configs/config-module-options';
 import { EmailModule } from './email';
@@ -13,6 +14,17 @@ import { AppLoggerModule } from './logger/logger.module';
   imports: [
     ConfigModule.forRoot(configModuleOptions),
     CacheModule.register({ ttl: 0 }),
+    JwtModule.registerAsync({
+      imports: [SharedModule],
+      useFactory: async (configService: ConfigService) => ({
+        publicKey: configService.get<string>('jwt.publicKey'),
+        privateKey: configService.get<string>('jwt.privateKey'),
+        signOptions: {
+          algorithm: 'RS256',
+        },
+      }),
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -34,10 +46,10 @@ import { AppLoggerModule } from './logger/logger.module';
     AppLoggerModule,
     EmailModule,
   ],
-  exports: [AppLoggerModule, ConfigModule, EmailModule, CacheModule],
+  exports: [AppLoggerModule, ConfigModule, EmailModule, CacheModule, JwtModule],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
-
+    JwtService,
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,

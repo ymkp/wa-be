@@ -1,7 +1,7 @@
-import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { firstValueFrom } from 'rxjs';
+import { UserRepository } from 'src/user/repositories/user.repository';
+import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constants';
 import { WA_WORKER_SEND_TEXT } from '../constants/whatsapp-client-url.constants';
 import { WHATSAPP_MESSAGE_CONTENT_TYPE } from '../constants/whatsapp-message-content-type.constants';
 import { WHATSAPP_MESSAGE_QUEUE_STATUS } from '../constants/whatsapp-message-queue-status.constants';
@@ -10,15 +10,16 @@ import { WhatsappMessage } from '../entities/whatsapp-message.entity';
 import { WhatsappMessageRepository } from '../repositories/whatsapp-message.entity';
 import { WhatsappCacheService } from './whatsapp-cache.service';
 import { WhatsappCLientService } from './whatsapp-client.service';
-var FormData = require('form-data');
+import { WhatsappWorkerService } from './whatsapp-worker.service';
 
 @Injectable()
 export class WHatsappSchedulerService {
   constructor(
     private readonly messageRepo: WhatsappMessageRepository,
-    private readonly httpService: HttpService,
+    private readonly workerAPI: WhatsappWorkerService,
     private readonly cacheService: WhatsappCacheService,
     private readonly clientService: WhatsappCLientService,
+    private readonly userRepo: UserRepository,
   ) {}
 
   onQueueMsg: WhatsappMessage[] = [];
@@ -71,7 +72,7 @@ export class WHatsappSchedulerService {
     this.transferFirst40OnQueueMsgs();
     for (let i = 0; i < this.onProgressMsg.length; i++) {
       try {
-        await this.sendMessage(this.onProgressMsg[i]);
+        await this.sendMessageWithKnownClientID(this.onProgressMsg[i]);
       } catch (err) {
         console.log('processOnQueue failed : ', this.onProgressMsg[i].id, err);
         await this.processFailedMessage(this.onProgressMsg[i]);
@@ -80,12 +81,28 @@ export class WHatsappSchedulerService {
     this.onProgressMsg = [];
   }
 
-  private async sendMessage(msg: WhatsappMessage): Promise<void> {
+  // TODO : implement this
+  private async sendMessageWithoutClientId(msg: WhatsappMessage) {
+    // FIXME : please use caching on this one
+    const user = await this.userRepo.findOneOrFail({
+      where: { id: msg.id },
+      select: ['id', 'permittedClients'],
+      relations: ['permittedClients'],
+    });
+  }
+  private async sendMessageWithKnownClientID(
+    msg: WhatsappMessage,
+  ): Promise<void> {
+    const c = await this.cacheService.getTokenFromClientId(msg.clientId);
+    //  FIXME : caching status client
+    // if (c.status && c.status === WHATSAPP_CLIENT_STATUS.ACTIVE) {
     if (msg.content.type === WHATSAPP_MESSAGE_CONTENT_TYPE.TEXT) {
-      const msgid = await this.sendTextMessage(
+      const msgid = await this.workerAPI.sendTextMessage(
         msg.clientId,
         msg.content.content,
         msg.contact.msisdn,
+        c.fullUrl,
+        c.token,
       );
       msg.status = WHATSAPP_MESSAGE_QUEUE_STATUS.SENT;
       msg.messageId = msgid;
@@ -93,32 +110,10 @@ export class WHatsappSchedulerService {
     } else {
       throw new BadRequestException();
     }
-  }
-
-  private async sendTextMessage(
-    clientId: number,
-    text: string,
-    recipient: string,
-  ): Promise<string> {
-    console.log('try to send message to : ', recipient);
-    const c = await this.cacheService.getTokenFromClientId(clientId);
-    const url = `${c.fullUrl}${WA_WORKER_SEND_TEXT}`;
-    const bodyFormData = new FormData();
-    bodyFormData.append('msisdn', recipient);
-    bodyFormData.append('message', text);
-    const res = await firstValueFrom(
-      this.httpService.post<WhatsappWorkerResponseDTO<{ msgid: string }>>(
-        url,
-        bodyFormData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${c.token}`,
-          },
-        },
-      ),
-    );
-    return res.data.data.msgid;
+    // } else {
+    //   console.log('cache : ', c);
+    //   throw new BadRequestException('client tidak siap untuk mengirim pesan');
+    // }
   }
 
   private async processFailedMessage(msg: WhatsappMessage): Promise<void> {

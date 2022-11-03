@@ -1,7 +1,10 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
@@ -35,6 +38,10 @@ export class WhatsappClient {
     default: WHATSAPP_CLIENT_STATUS.NONE,
   })
   status: WHATSAPP_CLIENT_STATUS;
+
+  @ManyToMany(() => User)
+  @JoinTable()
+  permittedUsers: User[];
 
   @CreateDateColumn({ name: 'createdAt', nullable: true })
   createdAt: Date;

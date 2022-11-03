@@ -19,10 +19,13 @@ export class UserAccessTokenClaims {
   username: string;
 
   @Expose()
-  other?: string;
+  other?: string | number[];
 
   @Expose()
   type?: string;
+
+  @Expose()
+  terumbuKarang?: boolean;
 }
 
 export class UserRefreshTokenClaims {

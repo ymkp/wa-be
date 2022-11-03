@@ -1,9 +1,12 @@
+import { WhatsappClient } from 'src/whatsapp/entities/whatsapp-client.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -38,6 +41,10 @@ export class User {
   @Unique('identificationNo', ['identificationNo'])
   @Column({ length: 30 })
   identificationNo: string;
+
+  @ManyToMany(() => WhatsappClient)
+  @JoinTable()
+  permittedClients: WhatsappClient[];
 
   @CreateDateColumn({ name: 'createdAt', nullable: true })
   createdAt: Date;

@@ -3,6 +3,7 @@ import { plainToInstance } from 'class-transformer';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
+import { User } from 'src/user/entities/user.entity';
 import { FindManyOptions } from 'typeorm';
 import { WHATSAPP_MESSAGE_CONTENT_TYPE } from '../constants/whatsapp-message-content-type.constants';
 import {
@@ -34,6 +35,7 @@ export class WhatsappMessageService {
 
   public async addTextMessage(
     input: CreateWhatsappMessageInput,
+    userId: number,
   ): Promise<WhatsappMessageOutputDTO> {
     // ? 1. get it on the queue
     const contact = await this.contactService.getOrCreateContact(
@@ -47,6 +49,7 @@ export class WhatsappMessageService {
       clientId: input.clientId,
       contact,
       content,
+      createdById: userId,
     });
     this.schedulerService.addQueue(m);
     return plainToInstance(WhatsappMessageOutputDTO, m);

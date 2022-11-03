@@ -1,4 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CustomRepository } from 'src/shared/decorators/typeorm-ex.decorator';
 import { Repository } from 'typeorm';
 
@@ -13,5 +17,21 @@ export class UserRepository extends Repository<User> {
     }
 
     return user;
+  }
+
+  async checkIsSuperAdmin(id: number): Promise<boolean> {
+    const user = await this.findOne({
+      where: { id },
+      select: ['id', 'isSuperAdmin'],
+    });
+    if (!user)
+      throw new UnauthorizedException(
+        `Only user with superadmin access have access to this route`,
+      );
+    if (!user.isSuperAdmin)
+      throw new UnauthorizedException(
+        `Only user with superadmin access have access to this route`,
+      );
+    return true;
   }
 }

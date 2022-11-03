@@ -7,10 +7,9 @@ import {
 import { compare, hash } from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { RegisterInput } from 'src/auth/dtos/auth-register-input.dto';
-import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
-import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
-import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
-import { FindManyOptions, FindOptionsWhere, In, Like } from 'typeorm';
+import { AuthTokenOutput } from 'src/auth/dtos/auth-token-output.dto';
+import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
+import { In } from 'typeorm';
 
 import { RequestContext } from '../../shared/request-context/request-context.dto';
 import {
@@ -26,7 +25,10 @@ import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly repository: UserRepository) {}
+  constructor(
+    private readonly repository: UserRepository,
+    private readonly signService: JwtSigningService,
+  ) {}
 
   async countUser(): Promise<number> {
     return await this.repository.count();
@@ -215,5 +217,54 @@ export class UserService {
     } else {
       throw new UnauthorizedException();
     }
+  }
+
+  public async checkIsSuperAdmin(id: number): Promise<boolean> {
+    return await this.repository.checkIsSuperAdmin(id);
+  }
+
+  public async generateWATokenForUser(id: number): Promise<AuthTokenOutput> {
+    const user = await this.repository.findOneOrFail({
+      where: { id },
+      select: {
+        id: true,
+        identificationNo: true,
+        isSuperAdmin: true,
+        permittedClients: { id: true },
+      },
+      relations: {
+        permittedClients: true,
+      },
+    });
+    const clientIds = user.permittedClients.map((c) => c.id);
+    return this.generateTokenWorker({
+      id: user.id,
+      identificationNo: user.identificationNo,
+      clientIds,
+      isSuperAdmin: user.isSuperAdmin,
+    });
+  }
+
+  private generateTokenWorker(input: {
+    id: number;
+    identificationNo: string;
+    clientIds: number[];
+    isSuperAdmin: boolean;
+  }): AuthTokenOutput {
+    const subject = { sub: input.id };
+    const payload = {
+      username: input.identificationNo,
+      sub: input.id,
+      other: input.clientIds,
+      type: 'wa-user',
+      terumbuKarang: input.isSuperAdmin,
+    };
+
+    console.log(payload);
+    const authToken = {
+      refreshToken: '',
+      accessToken: this.signService.signPayload({ ...payload, ...subject }),
+    };
+    return authToken;
   }
 }

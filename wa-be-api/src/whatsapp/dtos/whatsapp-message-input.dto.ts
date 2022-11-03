@@ -24,3 +24,20 @@ export class WhatsappMessageFilterInput {
   @IsOptional()
   clientId: number;
 }
+
+export class WhatsappTestMessageTextInput {
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  nOfTimes: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  token: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  seed: string;
+}
