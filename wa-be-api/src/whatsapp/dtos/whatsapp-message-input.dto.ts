@@ -32,7 +32,7 @@ export class WhatsappTestMessageTextInput {
   nOfTimes: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
   token: string;
 
@@ -40,4 +40,9 @@ export class WhatsappTestMessageTextInput {
   @IsString()
   @IsNotEmpty()
   seed: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  msisdn: string;
 }

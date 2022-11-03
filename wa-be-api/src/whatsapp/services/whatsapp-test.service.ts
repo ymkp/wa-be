@@ -22,11 +22,17 @@ export class WhatsappTestService {
     const contacts = await this.contactRepo.find({ select: ['id', 'msisdn'] });
     const msisdns = contacts.map((c) => c.msisdn);
     for (let i = 0; i < input.nOfTimes; i++) {
-      const content = await this.generateRandomText();
-      const contactMsisdn = msisdns[Math.floor(Math.random() * msisdns.length)];
+      // const content = await this.generateRandomText();
+      const content = Array(32)
+        .fill(null)
+        .map(() => Math.round(Math.random() * 16).toString(16))
+        .join('');
+      const contactMsisdn = input.msisdn
+        ? input.msisdn
+        : msisdns[Math.floor(Math.random() * msisdns.length)];
       try {
         await this.sendMessage(
-          'http://10.200.201.102:8055/api/v1/whatsapp-public/send/text',
+          'http://10.200.201.102:8017/api/v1/whatsapp-public/send/text',
           { content, contactMsisdn },
           input.token,
         );
@@ -40,12 +46,14 @@ export class WhatsappTestService {
 
   private async writeLog(log: string) {
     const content = `${log}, ${new Date(Date.now())}`;
-    await execAsync(`echo "${content}" > log.log`);
+    console.log(content);
+    await execAsync(`echo "${content}" >> log.log`);
   }
 
   private async writeErrorLog(log: string) {
     const content = `${log}, ${new Date(Date.now())}`;
-    await execAsync(`echo "${content}" > errorlog.log`);
+    console.log('err', content);
+    await execAsync(`echo "${content}" >> errorlog.log`);
   }
 
   private async sendMessage(

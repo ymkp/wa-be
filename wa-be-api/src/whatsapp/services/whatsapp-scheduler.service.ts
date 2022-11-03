@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { UserRepository } from 'src/user/repositories/user.repository';
 import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constants';
@@ -13,7 +18,7 @@ import { WhatsappCLientService } from './whatsapp-client.service';
 import { WhatsappWorkerService } from './whatsapp-worker.service';
 
 @Injectable()
-export class WHatsappSchedulerService {
+export class WHatsappSchedulerService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly messageRepo: WhatsappMessageRepository,
     private readonly workerAPI: WhatsappWorkerService,
@@ -25,6 +30,33 @@ export class WHatsappSchedulerService {
   onQueueMsg: WhatsappMessage[] = [];
   onProgressMsg: WhatsappMessage[] = [];
   failedMsgs: WhatsappMessage[] = [];
+
+  onModuleInit() {
+    this.onInit();
+  }
+
+  onModuleDestroy() {
+    this.onDestroy();
+  }
+
+  onInit() {
+    this.loadQueueMessage();
+  }
+
+  onDestroy() {}
+
+  private async loadQueueMessage() {
+    console.log('start load queue msgs');
+    const messages = await this.messageRepo.find({
+      where: {
+        status: WHATSAPP_MESSAGE_QUEUE_STATUS.ONQUEUE,
+      },
+    });
+    console.log('start load queue msgs : ', messages.length);
+    messages.forEach((m) => {
+      this.onQueueMsg.push(m);
+    });
+  }
 
   @Cron(CronExpression.EVERY_5_MINUTES)
   private async checkWorkerStatusCRON() {

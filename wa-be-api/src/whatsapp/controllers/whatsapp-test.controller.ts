@@ -18,10 +18,10 @@ export class WhatsappTestController {
   @ApiOperation({
     summary: 'send a message with public token',
   })
-  public async sendMessage(
+  public sendMessage(
     @ReqContext() ctx: RequestContext,
     @Body() body: WhatsappTestMessageTextInput,
   ) {
-    await this.test.sendTextMessage(ctx, body);
+    this.test.sendTextMessage(ctx, body);
   }
 }
