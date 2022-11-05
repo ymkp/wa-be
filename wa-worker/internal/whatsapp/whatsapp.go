@@ -203,12 +203,12 @@ func SendLocation(c echo.Context) error {
 
 	reqSendLocation.Latitude, err = strconv.ParseFloat(strings.TrimSpace(c.FormValue("latitude")), 64)
 	if err != nil {
-		return router.ResponseInternalError(c, "Error While Decoding Latitude to Float64")
+		return router.ResponseInternalError(c, "error While Decoding Latitude to Float64")
 	}
 
 	reqSendLocation.Longitude, err = strconv.ParseFloat(strings.TrimSpace(c.FormValue("longitude")), 64)
 	if err != nil {
-		return router.ResponseInternalError(c, "Error While Decoding Longitude to Float64")
+		return router.ResponseInternalError(c, "error While Decoding Longitude to Float64")
 	}
 
 	if len(reqSendLocation.RJID) == 0 {

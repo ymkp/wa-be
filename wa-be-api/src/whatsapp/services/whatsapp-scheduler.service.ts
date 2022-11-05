@@ -75,8 +75,12 @@ export class WHatsappSchedulerService implements OnModuleInit, OnModuleDestroy {
     this.onQueueMsg.push(msg);
   }
 
-  public async getQueueMessage(): Promise<WhatsappMessage[]> {
+  public async getOnQueueMessages(): Promise<WhatsappMessage[]> {
     return this.onQueueMsg;
+  }
+
+  public async getOnProgressMessages(): Promise<WhatsappMessage[]> {
+    return this.onProgressMsg;
   }
 
   public checkQueue() {

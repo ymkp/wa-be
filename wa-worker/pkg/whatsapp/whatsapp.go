@@ -19,6 +19,7 @@ import (
 	"go.mau.fi/whatsmeow/store"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	"go.mau.fi/whatsmeow/types"
+	"go.mau.fi/whatsmeow/types/events"
 
 	"wa-worker/pkg/env"
 	"wa-worker/pkg/log"
@@ -32,20 +33,45 @@ func init() {
 
 	dbType, err := env.GetEnvString("WHATSAPP_DATASTORE_TYPE")
 	if err != nil {
-		log.Print(nil).Fatal("Error Parse Environment Variable for WhatsApp Client Datastore Type")
+		log.Print(nil).Fatal("error Parse Environment Variable for WhatsApp Client Datastore Type")
 	}
 
 	dbURI, err := env.GetEnvString("WHATSAPP_DATASTORE_URI")
 	if err != nil {
-		log.Print(nil).Fatal("Error Parse Environment Variable for WhatsApp Client Datastore URI")
+		log.Print(nil).Fatal("error Parse Environment Variable for WhatsApp Client Datastore URI")
 	}
 
 	datastore, err := sqlstore.New(dbType, dbURI, nil)
 	if err != nil {
-		log.Print(nil).Fatal("Error Connect WhatsApp Client Datastore")
+		log.Print(nil).Fatal("error Connect WhatsApp Client Datastore")
 	}
 
 	WhatsAppDatastore = datastore
+}
+
+func WhatsappEventHandler(evt interface{}) {
+	switch v := evt.(type) {
+	case *events.Message:
+		if !v.Info.IsFromMe {
+			fmt.Println("GetConversation : ", v.Message.GetConversation())
+			fmt.Println("Sender : ", v.Info.Sender)
+			fmt.Println("Sender Number : ", v.Info.Sender.User)
+			fmt.Println("IsGroup : ", v.Info.IsGroup)
+			fmt.Println("MessageSource : ", v.Info.MessageSource)
+			fmt.Println("ID : ", v.Info.ID)
+			fmt.Println("PushName : ", v.Info.PushName)
+			fmt.Println("BroadcastListOwner : ", v.Info.BroadcastListOwner)
+			fmt.Println("Category : ", v.Info.Category)
+			fmt.Println("Chat : ", v.Info.Chat)
+			fmt.Println("DeviceSentMeta : ", v.Info.DeviceSentMeta)
+			fmt.Println("IsFromMe : ", v.Info.IsFromMe)
+			fmt.Println("MediaType : ", v.Info.MediaType)
+			fmt.Println("Multicast : ", v.Info.Multicast)
+			fmt.Println("Info.Chat.Server : ", v.Info.Chat.Server)
+
+		}
+	}
+
 }
 
 func WhatsAppInitClient(device *store.Device, jid string) {
@@ -79,6 +105,7 @@ func WhatsAppInitClient(device *store.Device, jid string) {
 		// Initialize New WhatsApp Client
 		// And Save it to The Map
 		WhatsAppClient[jid] = whatsmeow.NewClient(device, nil)
+		WhatsAppClient[jid].AddEventHandler(WhatsappEventHandler)
 
 		// Set WhatsApp Client Auto Reconnect
 		WhatsAppClient[jid].EnableAutoReconnect = true
@@ -393,7 +420,7 @@ func WhatsAppSendDocument(ctx context.Context, jid string, rjid string, fileByte
 		// Upload File to WhatsApp Storage Server
 		fileUploaded, err := WhatsAppClient[jid].Upload(ctx, fileBytes, whatsmeow.MediaDocument)
 		if err != nil {
-			return "", errors.New("Error While Uploading Media to WhatsApp Server")
+			return "", errors.New("error While Uploading Media to WhatsApp Server")
 		}
 
 		// Compose WhatsApp Proto
@@ -452,13 +479,13 @@ func WhatsAppSendImage(ctx context.Context, jid string, rjid string, imageBytes 
 		if imageType == "image/webp" && isWhatsAppImageConvertWebP {
 			imgConvDecode, err := imgconv.Decode(bytes.NewReader(imageBytes))
 			if err != nil {
-				return "", errors.New("Error While Decoding Convert Image Stream")
+				return "", errors.New("error While Decoding Convert Image Stream")
 			}
 
 			imgConvEncode := new(bytes.Buffer)
 			err = imgconv.Write(imgConvEncode, imgConvDecode, &imgconv.FormatOption{Format: imgconv.PNG})
 			if err != nil {
-				return "", errors.New("Error While Encoding Convert Image Stream")
+				return "", errors.New("error While Encoding Convert Image Stream")
 			}
 
 			imageBytes = imgConvEncode.Bytes()
@@ -475,7 +502,7 @@ func WhatsAppSendImage(ctx context.Context, jid string, rjid string, imageBytes 
 		if isWhatsAppImageCompression {
 			imgResizeDecode, err := imgconv.Decode(bytes.NewReader(imageBytes))
 			if err != nil {
-				return "", errors.New("Error While Decoding Resize Image Stream")
+				return "", errors.New("error While Decoding Resize Image Stream")
 			}
 
 			imgResizeEncode := new(bytes.Buffer)
@@ -485,7 +512,7 @@ func WhatsAppSendImage(ctx context.Context, jid string, rjid string, imageBytes 
 				&imgconv.FormatOption{})
 
 			if err != nil {
-				return "", errors.New("Error While Encoding Resize Image Stream")
+				return "", errors.New("error While Encoding Resize Image Stream")
 			}
 
 			imageBytes = imgResizeEncode.Bytes()
@@ -495,7 +522,7 @@ func WhatsAppSendImage(ctx context.Context, jid string, rjid string, imageBytes 
 		// With Permanent Width 640px and Preserve Aspect Ratio
 		imgThumbDecode, err := imgconv.Decode(bytes.NewReader(imageBytes))
 		if err != nil {
-			return "", errors.New("Error While Decoding Thumbnail Image Stream")
+			return "", errors.New("error While Decoding Thumbnail Image Stream")
 		}
 
 		imgThumbEncode := new(bytes.Buffer)
@@ -505,13 +532,13 @@ func WhatsAppSendImage(ctx context.Context, jid string, rjid string, imageBytes 
 			&imgconv.FormatOption{Format: imgconv.JPEG})
 
 		if err != nil {
-			return "", errors.New("Error While Encoding Thumbnail Image Stream")
+			return "", errors.New("error While Encoding Thumbnail Image Stream")
 		}
 
 		// Upload Image to WhatsApp Storage Server
 		imageUploaded, err := WhatsAppClient[jid].Upload(ctx, imageBytes, whatsmeow.MediaImage)
 		if err != nil {
-			return "", errors.New("Error While Uploading Media to WhatsApp Server")
+			return "", errors.New("error While Uploading Media to WhatsApp Server")
 		}
 
 		// Compose WhatsApp Proto
@@ -564,7 +591,7 @@ func WhatsAppSendAudio(ctx context.Context, jid string, rjid string, audioBytes 
 		// Upload Audio to WhatsApp Storage Server
 		audioUploaded, err := WhatsAppClient[jid].Upload(ctx, audioBytes, whatsmeow.MediaAudio)
 		if err != nil {
-			return "", errors.New("Error While Uploading Media to WhatsApp Server")
+			return "", errors.New("error While Uploading Media to WhatsApp Server")
 		}
 
 		// Compose WhatsApp Proto
@@ -614,7 +641,7 @@ func WhatsAppSendVideo(ctx context.Context, jid string, rjid string, videoBytes 
 		// Upload Video to WhatsApp Storage Server
 		videoUploaded, err := WhatsAppClient[jid].Upload(ctx, videoBytes, whatsmeow.MediaVideo)
 		if err != nil {
-			return "", errors.New("Error While Uploading Media to WhatsApp Server")
+			return "", errors.New("error While Uploading Media to WhatsApp Server")
 		}
 
 		// Compose WhatsApp Proto
@@ -759,7 +786,7 @@ func WhatsAppSendSticker(ctx context.Context, jid string, rjid string, stickerBy
 
 		stickerConvDecode, err := imgconv.Decode(bytes.NewReader(stickerBytes))
 		if err != nil {
-			return "", errors.New("Error While Decoding Convert Sticker Stream")
+			return "", errors.New("error While Decoding Convert Sticker Stream")
 		}
 
 		stickerConvResize := imgconv.Resize(stickerConvDecode, &imgconv.ResizeOption{Width: 512, Height: 512})
@@ -767,7 +794,7 @@ func WhatsAppSendSticker(ctx context.Context, jid string, rjid string, stickerBy
 
 		err = webp.Encode(stickerConvEncode, stickerConvResize)
 		if err != nil {
-			return "", errors.New("Error While Encoding Convert Sticker Stream")
+			return "", errors.New("error While Encoding Convert Sticker Stream")
 		}
 
 		stickerBytes = stickerConvEncode.Bytes()
@@ -775,7 +802,7 @@ func WhatsAppSendSticker(ctx context.Context, jid string, rjid string, stickerBy
 		// Upload Image to WhatsApp Storage Server
 		stickerUploaded, err := WhatsAppClient[jid].Upload(ctx, stickerBytes, whatsmeow.MediaImage)
 		if err != nil {
-			return "", errors.New("Error While Uploading Media to WhatsApp Server")
+			return "", errors.New("error While Uploading Media to WhatsApp Server")
 		}
 
 		// Compose WhatsApp Proto

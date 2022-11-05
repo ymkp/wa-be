@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { WHATSAPP_MESSAGE_QUEUE_STATUS } from '../constants/whatsapp-message-queue-status.constants';
 
 export class CreateWhatsappMessageInput {
   @ApiPropertyOptional()
@@ -23,6 +30,11 @@ export class WhatsappMessageFilterInput {
   @IsNumber()
   @IsOptional()
   clientId: number;
+
+  @ApiPropertyOptional()
+  @IsEnum(WHATSAPP_MESSAGE_QUEUE_STATUS)
+  @IsOptional()
+  status: WHATSAPP_MESSAGE_QUEUE_STATUS;
 }
 
 export class WhatsappTestMessageTextInput {

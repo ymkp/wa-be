@@ -3,8 +3,7 @@ import { plainToInstance } from 'class-transformer';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
-import { User } from 'src/user/entities/user.entity';
-import { FindManyOptions } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere } from 'typeorm';
 import { WHATSAPP_MESSAGE_CONTENT_TYPE } from '../constants/whatsapp-message-content-type.constants';
 import {
   CreateWhatsappMessageInput,
@@ -64,6 +63,10 @@ export class WhatsappMessageService {
       skip: (paginationQ.page - 1) * paginationQ.limit,
       order: { id: 'DESC' },
     };
+    const where: FindOptionsWhere<WhatsappMessage> = {};
+    if (filterQ.clientId) where.clientId = filterQ.clientId;
+    if (filterQ.status) where.status = filterQ.status;
+    options.where = where;
     const [res, count] = await this.messageRepo.findAndCount(options);
     const meta: PaginationResponseDto = {
       count,
@@ -74,8 +77,16 @@ export class WhatsappMessageService {
     return { data, meta };
   }
 
-  public async getQueueMessage(): Promise<WhatsappMessage[]> {
-    return this.schedulerService.getQueueMessage();
+  public async getOnQueueMessages(): Promise<WhatsappMessageOutputDTOMini[]> {
+    const res = await this.schedulerService.getOnQueueMessages();
+    return plainToInstance(WhatsappMessageOutputDTOMini, res);
+  }
+
+  public async getOnProgressMessages(): Promise<
+    WhatsappMessageOutputDTOMini[]
+  > {
+    const res = await this.schedulerService.getOnProgressMessages();
+    return plainToInstance(WhatsappMessageOutputDTOMini, res);
   }
 
   public async getMessageDetail(id: number): Promise<WhatsappMessageOutputDTO> {

@@ -32,36 +32,6 @@ export class UserFilterInput {
   identificationNo: string;
 
   @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  divisiId: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  biroId: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  bagianId: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  divisiModeratorId: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  biroModeratorId: number;
-
-  @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
   isAccountDisabled: boolean;
@@ -103,24 +73,6 @@ export class UserCreateBody {
   @IsString()
   @IsNotEmpty()
   identificationNo: string;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  divisiId: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  biroId: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  bagianId: number;
 }
 
 export class UserEditBody {
@@ -148,36 +100,6 @@ export class UserEditBody {
   @IsString()
   @IsOptional()
   identificationNo: string;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  divisiId: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  biroId: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  bagianId: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  biroModeratorId: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  divisiModeratorId: number;
 
   @ApiPropertyOptional()
   @IsBoolean()

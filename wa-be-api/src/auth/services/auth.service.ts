@@ -79,11 +79,7 @@ export class AuthService {
     input: RegisterInput,
   ): Promise<RegisterOutput> {
     const requestor = await this.userService.getByContext(ctx);
-    if (
-      requestor.divisiModeratorId !== input.divisiId &&
-      !requestor.isSuperAdmin
-    )
-      throw new UnauthorizedException();
+    if (!requestor.isSuperAdmin) throw new UnauthorizedException();
     input.isAccountDisabled = false;
     if (!input.password) {
       input.password = await this.createRandomPassword(input.email);

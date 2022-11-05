@@ -55,12 +55,20 @@ export class WhatsappMessageController {
     return await this.service.addTextMessage(body, ctx.user.id);
   }
 
-  @Get('/queue')
+  @Get('/onqueue')
   @ApiOperation({
     summary: 'get list of WA messages still on queues',
   })
-  async getQueuedMessages() {
-    this.service.getQueueMessage();
+  async getOnQueuedMessages(): Promise<WhatsappMessageOutputDTOMini[]> {
+    return await this.service.getOnQueueMessages();
+  }
+
+  @Get('/onprogress')
+  @ApiOperation({
+    summary: 'get list of WA messages still on progress',
+  })
+  async getOnProgressMessages(): Promise<WhatsappMessageOutputDTOMini[]> {
+    return await this.service.getOnProgressMessages();
   }
 
   @Get('/detail/:id')

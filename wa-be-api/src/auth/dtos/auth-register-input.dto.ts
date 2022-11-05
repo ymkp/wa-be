@@ -37,21 +37,6 @@ export class RegisterInput {
   @MaxLength(100)
   identificationNo: string;
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsNumber()
-  divisiId: number;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsNumber()
-  biroId: number;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsNumber()
-  bagianId: number;
-
   // These keys can only be set by ADMIN user.
   // roles: ROLE[] = [ROLE.USER];
   isAccountDisabled: boolean;
