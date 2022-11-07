@@ -4,7 +4,7 @@ import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
 import { FindManyOptions, FindOptionsWhere } from 'typeorm';
-import { WHATSAPP_MESSAGE_CONTENT_TYPE } from '../constants/whatsapp-message-content-type.constants';
+import { WHATSAPP_MESSAGE_CONTENT_TYPE } from '../constants/whatsapp-message-content-type.constant';
 import {
   CreateWhatsappMessageInput,
   WhatsappMessageFilterInput,

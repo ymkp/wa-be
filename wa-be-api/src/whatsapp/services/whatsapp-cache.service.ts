@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
-import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constants';
+import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constant';
 import { WhatsappCacheInfo } from '../dtos/whatsapp-cache.interface';
 import { WhatsappClientEntityInput } from '../dtos/whatsapp-client-input.dto';
 import { WhatsappClientRepository } from '../repositories/whatsapp-client.repository';
@@ -67,7 +67,9 @@ export class WhatsappCacheService {
     const status = await this.cacheManager.get<WHATSAPP_CLIENT_STATUS>(
       `status-${id}`,
     );
-    cache.status = status;
+    if (cache) {
+      cache.status = status ?? WHATSAPP_CLIENT_STATUS.NONE;
+    }
     return cache;
   }
 

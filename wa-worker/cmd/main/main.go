@@ -38,6 +38,7 @@ import (
 	"wa-worker/pkg/router"
 
 	"wa-worker/internal"
+	pkgWhatsApp "wa-worker/pkg/whatsapp"
 )
 
 type Server struct {
@@ -126,10 +127,6 @@ func main() {
 	// Get Server Configuration
 	var serverConfig Server
 
-	// serverConfig.Address, err = env.GetEnvString("SERVER_ADDRESS")
-	// if err != nil {
-	// 	serverConfig.Address = "127.0.0.1"
-	// }
 	serverConfig.Address = "127.0.0.1"
 
 	serverConfig.Port, err = env.GetEnvString("SERVER_PORT")
@@ -144,6 +141,7 @@ func main() {
 			log.Print(nil).Fatal(err.Error())
 		}
 	}()
+	pkgWhatsApp.HookToBEAfterBuilt()
 
 	// Watch for Shutdown Signal
 	sigShutdown := make(chan os.Signal, 1)

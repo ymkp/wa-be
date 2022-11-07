@@ -12,12 +12,12 @@ import (
 
 func SanitizeEnv(envName string) (string, error) {
 	if len(envName) == 0 {
-		return "", errors.New("Environment Variable Name Should Not Empty")
+		return "", errors.New("environment Variable Name Should Not Empty")
 	}
 
 	retValue := strings.TrimSpace(os.Getenv(envName))
 	if len(retValue) == 0 {
-		return "", errors.New("Environment Variable '" + envName + "' Has an Empty Value")
+		return "", errors.New("environment Variable '" + envName + "' Has an Empty Value")
 	}
 
 	return retValue, nil
@@ -29,8 +29,6 @@ func GetEnvString(envName string) (string, error) {
 		log.Print(nil).Info("env not found : " + envName)
 		return "", err
 	}
-	log.Print(nil).Info("env found : " + envName + " : " + envValue)
-
 	return envValue, nil
 }
 

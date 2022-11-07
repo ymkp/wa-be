@@ -11,6 +11,8 @@ export const configModuleOptions: ConfigModuleOptions = {
       .valid('development', 'production', 'test')
       .default('development'),
     APP_PORT: Joi.number().required(),
+    APP_URL: Joi.string().required(),
+    APP_PREFIX: Joi.string().required(),
     DB_HOST: Joi.string().required(),
     DOC_PASS: Joi.string().required(),
     DB_PORT: Joi.number().optional(),
@@ -31,5 +33,6 @@ export const configModuleOptions: ConfigModuleOptions = {
     EMAIL_FORGOT_PASSWORD_URL: Joi.string().required(),
     AUTH_BASIC_PASSWORD: Joi.string().required(),
     WORKER_DIR: Joi.string().required(),
+    WORKER_TITLE: Joi.string().required(),
   }),
 };

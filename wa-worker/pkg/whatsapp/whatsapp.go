@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 
 	webp "github.com/nickalie/go-webpbin"
@@ -23,6 +24,8 @@ import (
 
 	"wa-worker/pkg/env"
 	"wa-worker/pkg/log"
+
+	jsonHelper "wa-worker/internal/utils"
 )
 
 var WhatsAppDatastore *sqlstore.Container
@@ -49,27 +52,67 @@ func init() {
 	WhatsAppDatastore = datastore
 }
 
+func HookToBEAfterBuilt() {
+	port, _ := env.GetEnvString("SERVER_PORT")
+
+	log.Print(nil).Info("hook to BE ", port)
+	bodyValues := map[string]string{
+		"port": port,
+	}
+	body := jsonHelper.MakeJsonBody(bodyValues)
+	url, _ := env.GetEnvString("BE_API_HOOK_URL")
+	log.Print(nil).Info("hook to BE : ", port, url)
+	_, err := http.Post(url+"/worker/init", "application/json", body)
+	if err != nil {
+		log.Print(nil).Error(err)
+	}
+}
+
 func WhatsappEventHandler(evt interface{}) {
 	switch v := evt.(type) {
 	case *events.Message:
-		if !v.Info.IsFromMe {
-			fmt.Println("GetConversation : ", v.Message.GetConversation())
-			fmt.Println("Sender : ", v.Info.Sender)
-			fmt.Println("Sender Number : ", v.Info.Sender.User)
-			fmt.Println("IsGroup : ", v.Info.IsGroup)
-			fmt.Println("MessageSource : ", v.Info.MessageSource)
-			fmt.Println("ID : ", v.Info.ID)
-			fmt.Println("PushName : ", v.Info.PushName)
-			fmt.Println("BroadcastListOwner : ", v.Info.BroadcastListOwner)
-			fmt.Println("Category : ", v.Info.Category)
-			fmt.Println("Chat : ", v.Info.Chat)
-			fmt.Println("DeviceSentMeta : ", v.Info.DeviceSentMeta)
-			fmt.Println("IsFromMe : ", v.Info.IsFromMe)
-			fmt.Println("MediaType : ", v.Info.MediaType)
-			fmt.Println("Multicast : ", v.Info.Multicast)
-			fmt.Println("Info.Chat.Server : ", v.Info.Chat.Server)
 
+		fmt.Println("-------------------------------------------0")
+		fmt.Println("GetConversation : ", v.Message.GetConversation())
+		fmt.Println("Sender : ", v.Info.Sender)
+		fmt.Println("Sender Number : ", v.Info.Sender.User)
+		fmt.Println("IsGroup : ", v.Info.IsGroup)
+		fmt.Println("MessageSource : ", v.Info.MessageSource)
+		fmt.Println("ID : ", v.Info.ID)
+		fmt.Println("PushName : ", v.Info.PushName)
+		fmt.Println("BroadcastListOwner : ", v.Info.BroadcastListOwner)
+		fmt.Println("Category : ", v.Info.Category)
+		fmt.Println("Chat : ", v.Info.Chat)
+		fmt.Println("DeviceSentMeta : ", v.Info.DeviceSentMeta)
+		fmt.Println("IsFromMe : ", v.Info.IsFromMe)
+		fmt.Println("MediaType : ", v.Info.MediaType)
+		fmt.Println("Multicast : ", v.Info.Multicast)
+		fmt.Println("Info.Chat.Server : ", v.Info.Chat.Server)
+		fmt.Println("-------------------------------------xxxxxxxx")
+		fmt.Println("")
+		msgType := ""
+		if v.Info.IsFromMe {
+			msgType = "me"
+		} else {
+			msgType = "other"
 		}
+		port, _ := env.GetEnvString("SERVER_PORT")
+		bodyValues := map[string]string{
+			"id":        v.Info.ID,
+			"contact":   v.Info.Chat.User,
+			"port":      port,
+			"message":   v.Message.GetConversation(),
+			"mediaType": v.Info.MediaType,
+			"type":      msgType,
+		}
+		body := jsonHelper.MakeJsonBody(bodyValues)
+		url, _ := env.GetEnvString("BE_API_HOOK_URL")
+		_, err := http.Post(url+"/message/receive", "application/json", body)
+
+		if err != nil {
+			log.Print(nil).Error(err)
+		}
+
 	}
 
 }
@@ -84,7 +127,8 @@ func WhatsAppInitClient(device *store.Device, jid string) {
 		}
 
 		// Set Client Properties
-		store.DeviceProps.Os = proto.String("Situspol WA Mimin - Dev")
+		devicePropTitle, _ := env.GetEnvString("WHATSAPP_PROP_TITLE")
+		store.DeviceProps.Os = proto.String(devicePropTitle)
 		store.DeviceProps.PlatformType = waproto.DeviceProps_DESKTOP.Enum()
 		store.DeviceProps.RequireFullSync = proto.Bool(false)
 

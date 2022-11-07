@@ -1,6 +1,8 @@
 export default (): any => ({
   env: process.env.APP_ENV,
   port: process.env.APP_PORT,
+  prefix: process.env.APP_PREFIX,
+  url: process.env.APP_URL,
   doc_pass: process.env.DOC_PASS,
   database: {
     host: process.env.DB_HOST,
@@ -41,4 +43,5 @@ export default (): any => ({
   authBasicPassword: process.env.AUTH_BASIC_PASSWORD,
   waWorkerDir: process.env.WORKER_DIR,
   waWorkerUrl: process.env.WORKER_URL,
+  waWorkerTitle: process.env.WORKER_TITLE,
 });

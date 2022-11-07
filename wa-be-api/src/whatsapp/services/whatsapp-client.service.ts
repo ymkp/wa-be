@@ -18,7 +18,7 @@ import * as fs from 'fs';
 import * as util from 'util';
 import { WhatsappClient } from '../entities/whatsapp-client.entity';
 import { WhatsappCacheService } from './whatsapp-cache.service';
-import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constants';
+import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constant';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import { FindManyOptions } from 'typeorm';
 import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
@@ -56,14 +56,19 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
           serverPort: clients[i].port,
         });
       }
-      console.log('wait 5 secs');
-      await new Promise((r) => setTimeout(r, 5000));
-      for (let i = 0; i < clients.length; i++) {
-        await this.loginAWorkerPrivate(clients[i]);
-      }
     } else {
       console.log('there is no registered clients');
     }
+  }
+
+  async workerInitFromHook(port: number): Promise<void> {
+    console.log('check worker init port : ', port);
+    const client = await this.getClientByPORT(port);
+    await this.loginAWorkerPrivate(client);
+  }
+
+  public async getClientByPORT(port: number): Promise<WhatsappClient> {
+    return await this.clientRepo.findOneOrFail({ where: { port } });
   }
 
   public async checkClientStatus(
@@ -196,11 +201,11 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
           'failed to save to cache : token-',
           client.msisdn,
           ' : ',
-          err.response.data,
+          err,
         );
       }
     } catch (err) {
-      console.log('failed to login : ', err.response.data);
+      console.log('failed to login : ', err);
     }
   }
 
@@ -227,11 +232,17 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
       );
       console.log('success');
     } catch (err) {
-      console.log(err.response.data);
+      console.log(err);
     }
   }
 
   private buildEnv(input: WhatsappWorkerCreateParameter): string {
+    const beApiHookURL =
+      this.configService.get('url') +
+      ':' +
+      this.configService.get('port') +
+      this.configService.get('prefix') +
+      '/whatsapp-hook';
     return `
     SERVER_PORT=${input.serverPort}
     AUTH_BASIC_USERNAME=${input.authBasicUsername}
@@ -243,6 +254,8 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
     WHATSAPP_MEDIA_IMAGE_COMPRESSION=true
     WHATSAPP_MEDIA_IMAGE_CONVERT_WEBP=true
     LIBWEBP_VERSION=0.6.1
+    BE_API_HOOK_URL=${beApiHookURL}
+    WHATSAPP_PROP_TITLE=${this.configService.get('waWorkerTitle')}
     `;
   }
 

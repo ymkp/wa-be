@@ -9,12 +9,14 @@ import { RequestIdMiddleware } from './shared/middlewares/request-id/request-id.
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe(VALIDATION_PIPE_OPTIONS));
   app.use(RequestIdMiddleware);
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
   const configService = app.get(ConfigService);
+  const appPrefix = configService.get('prefix');
+  console.log('app prefix : ', appPrefix);
+  app.setGlobalPrefix(appPrefix);
   const corsOptions = {
     allowedHeaders: '*',
     origin: '*',

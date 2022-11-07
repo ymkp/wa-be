@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { UserRepository } from 'src/user/repositories/user.repository';
-import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constants';
-import { WA_WORKER_SEND_TEXT } from '../constants/whatsapp-client-url.constants';
-import { WHATSAPP_MESSAGE_CONTENT_TYPE } from '../constants/whatsapp-message-content-type.constants';
-import { WHATSAPP_MESSAGE_QUEUE_STATUS } from '../constants/whatsapp-message-queue-status.constants';
+import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constant';
+import { WA_WORKER_SEND_TEXT } from '../constants/whatsapp-client-url.constant';
+import { WHATSAPP_MESSAGE_CONTENT_TYPE } from '../constants/whatsapp-message-content-type.constant';
+import { WHATSAPP_MESSAGE_QUEUE_STATUS } from '../constants/whatsapp-message-queue-status.constant';
 import { WhatsappWorkerResponseDTO } from '../dtos/whatsapp-worker.dto';
 import { WhatsappMessage } from '../entities/whatsapp-message.entity';
 import { WhatsappMessageRepository } from '../repositories/whatsapp-message.entity';

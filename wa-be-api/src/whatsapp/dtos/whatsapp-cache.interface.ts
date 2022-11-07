@@ -1,4 +1,4 @@
-import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constants';
+import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constant';
 
 export interface WhatsappCacheInfo {
   clientId: number;

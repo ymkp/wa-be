@@ -6,7 +6,7 @@ import {
   WA_WORKER_LOGIN,
   WA_WORKER_SEND_TEXT,
   WA_WORKER_STATUS,
-} from '../constants/whatsapp-client-url.constants';
+} from '../constants/whatsapp-client-url.constant';
 import { WhatsappCacheInfo } from '../dtos/whatsapp-cache.interface';
 import { WhatsappWorkerResponseDTO } from '../dtos/whatsapp-worker.dto';
 var FormData = require('form-data');

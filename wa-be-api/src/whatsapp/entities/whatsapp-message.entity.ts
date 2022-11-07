@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { WHATSAPP_MESSAGE_QUEUE_STATUS } from '../constants/whatsapp-message-queue-status.constants';
+import { WHATSAPP_MESSAGE_QUEUE_STATUS } from '../constants/whatsapp-message-queue-status.constant';
 import { WhatsappClient } from './whatsapp-client.entity';
 import { WhatsappContact } from './whatsapp-contact.entity';
 import { WhatsappMessageContent } from './whatsapp-message-content.entity';
