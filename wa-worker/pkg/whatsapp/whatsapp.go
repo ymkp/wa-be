@@ -56,7 +56,8 @@ func HookToBEAfterBuilt() {
 	port, _ := env.GetEnvString("SERVER_PORT")
 
 	log.Print(nil).Info("hook to BE ", port)
-	bodyValues := map[string]string{
+	var bodyValues map[string]interface{}
+	bodyValues = map[string]interface{}{
 		"port": port,
 	}
 	body := jsonHelper.MakeJsonBody(bodyValues)
@@ -90,27 +91,29 @@ func WhatsappEventHandler(evt interface{}) {
 		fmt.Println("Info.Chat.Server : ", v.Info.Chat.Server)
 		fmt.Println("-------------------------------------xxxxxxxx")
 		fmt.Println("")
-		msgType := ""
-		if v.Info.IsFromMe {
-			msgType = "me"
-		} else {
-			msgType = "other"
-		}
-		port, _ := env.GetEnvString("SERVER_PORT")
-		bodyValues := map[string]string{
-			"id":        v.Info.ID,
-			"contact":   v.Info.Chat.User,
-			"port":      port,
-			"message":   v.Message.GetConversation(),
-			"mediaType": v.Info.MediaType,
-			"type":      msgType,
-		}
-		body := jsonHelper.MakeJsonBody(bodyValues)
-		url, _ := env.GetEnvString("BE_API_HOOK_URL")
-		_, err := http.Post(url+"/message/receive", "application/json", body)
 
-		if err != nil {
-			log.Print(nil).Error(err)
+		if v.Info.IsGroup {
+			// TODO : group implementation
+		} else {
+
+			port, _ := env.GetEnvString("SERVER_PORT")
+			var bodyValues map[string]interface{}
+			bodyValues = map[string]interface{}{
+				"id":          v.Info.ID,
+				"contact":     v.Info.Chat.User,
+				"port":        port,
+				"message":     v.Message.GetConversation(),
+				"mediaType":   v.Info.MediaType,
+				"isFromMe":    v.Info.IsFromMe,
+				"isFromGroup": v.Info.IsGroup,
+			}
+			body := jsonHelper.MakeJsonBody(bodyValues)
+			url, _ := env.GetEnvString("BE_API_HOOK_URL")
+			_, err := http.Post(url+"/message/receive", "application/json", body)
+
+			if err != nil {
+				log.Print(nil).Error(err)
+			}
 		}
 
 	}

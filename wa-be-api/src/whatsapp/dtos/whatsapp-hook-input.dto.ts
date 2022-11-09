@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class HookWorkerInitDTO {
   @ApiProperty()
@@ -35,7 +35,12 @@ export class HookReceivedMessageDTO {
   mediaType: string;
 
   @ApiPropertyOptional()
-  @IsString()
+  @IsBoolean()
   @IsOptional()
-  type: string;
+  isFromMe: boolean;
+
+  @ApiPropertyOptional()
+  @IsBoolean()
+  @IsOptional()
+  isFromGroup: boolean;
 }

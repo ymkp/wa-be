@@ -8,6 +8,7 @@ import { UserRepository } from 'src/user/repositories/user.repository';
 import { UserService } from 'src/user/services/user.service';
 import { WhatsappClientController } from './controllers/whatsapp-client.controller';
 import { WhatsappContactController } from './controllers/whatsapp-contact.controller';
+import { WhatsappCOnversationController } from './controllers/whatsapp-conversation.controller';
 import { WhatsappHookController } from './controllers/whatsapp-hook.controller';
 import { WhatsappMessageController } from './controllers/whatsapp-message.controller';
 import { WhatsappPublicController } from './controllers/whatsapp-public.controller';
@@ -67,6 +68,7 @@ import { WhatsappContactService } from './services/whtasapp-contact.service';
     WhatsappPublicController,
     WhatsappTestController,
     WhatsappHookController,
+    WhatsappCOnversationController,
   ],
 })
 export class WhatsappModule {}

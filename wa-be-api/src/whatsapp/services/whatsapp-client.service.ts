@@ -84,21 +84,22 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
     const c = await this.cacheService.getTokenFromClientId(id);
     try {
       const res = await this.workerAPI.checkClientStatus(c);
-      console.log(res.data);
+      // console.log(res.data);
       if (client.status != WHATSAPP_CLIENT_STATUS.ACTIVE) {
         client.status = WHATSAPP_CLIENT_STATUS.ACTIVE;
         await this.clientRepo.save(client);
       }
       return res.data;
     } catch (err) {
-      console.log('failed to check client : ', err.response.data);
-      if (err.response.data.code === 404) {
-        client.status = WHATSAPP_CLIENT_STATUS.LOGGEDOUT;
-      } else {
-        client.status = WHATSAPP_CLIENT_STATUS.ERROR;
-      }
-      await this.cacheService.updateClientStatus(client.id, client.status);
-      await this.clientRepo.save(client);
+      try {
+        if (err.response.data.code === 404) {
+          client.status = WHATSAPP_CLIENT_STATUS.LOGGEDOUT;
+        } else {
+          client.status = WHATSAPP_CLIENT_STATUS.ERROR;
+        }
+        await this.cacheService.updateClientStatus(client.id, client.status);
+        await this.clientRepo.save(client);
+      } catch (err) {}
     }
   }
 
