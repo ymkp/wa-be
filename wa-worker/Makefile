@@ -33,7 +33,7 @@ vendor:
 run:
 	make vendor
 	go run cmd/main/*.go
-	
+
 gen-docs:
 	rm -rf docs/*
 	swag init -g cmd/main/main.go --output docs

@@ -129,7 +129,7 @@ export class WhatsappConversationService {
   public async createConversationMessage(
     input: HookReceivedMessageDTO,
   ): Promise<WhatsappConversationMessage> {
-    if (input.isFromGroup) {
+    if (!input.isFromGroup) {
       // ? get client
       const client = await this.clientService.getClientByPORT(
         parseInt(input.port, 10),
