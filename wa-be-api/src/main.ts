@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { urlencoded, json } from 'express';
 import { AppModule } from './app.module';
+import { RedisIoAdapter } from './shared/adapters/redis-io.adapter';
 import { VALIDATION_PIPE_OPTIONS } from './shared/constants';
 import { RequestIdMiddleware } from './shared/middlewares/request-id/request-id.middleware';
 
@@ -13,6 +14,11 @@ async function bootstrap() {
   app.use(RequestIdMiddleware);
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
+  // Uncomment these lines to use the Redis adapter:
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis();
+  app.useWebSocketAdapter(redisIoAdapter);
+
   const configService = app.get(ConfigService);
   const appPrefix = configService.get('prefix');
   console.log('app prefix : ', appPrefix);

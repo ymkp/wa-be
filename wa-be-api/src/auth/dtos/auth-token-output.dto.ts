@@ -16,7 +16,7 @@ export class UserAccessTokenClaims {
   id: number;
 
   @Expose()
-  username: string;
+  username?: string;
 
   @Expose()
   other?: string | number[];

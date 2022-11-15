@@ -51,11 +51,11 @@ export class AuthService {
   async validateUser(
     ctx: RequestContext,
     username: string,
-    pass: string,
+    password: string,
   ): Promise<UserAccessTokenClaims> {
     const user = await this.userService.validateUsernamePassword(
       username,
-      pass,
+      password,
     );
 
     // Prevent disabled users from logging in.

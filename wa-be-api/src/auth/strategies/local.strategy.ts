@@ -24,6 +24,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, STRATEGY_LOCAL) {
     username: string,
     password: string,
   ): Promise<UserAccessTokenClaims> {
+    console.log('local strategy?', request, username, password);
     const ctx = createRequestContext(request);
 
     const user = await this.authService.validateUser(ctx, username, password);

@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { UserService } from 'src/user/services/user.service';
 
+// FIXME : fix this like eberkas!
 @Injectable()
 export class SuperAdminGuard implements CanActivate {
   constructor(private readonly userService: UserService) {}

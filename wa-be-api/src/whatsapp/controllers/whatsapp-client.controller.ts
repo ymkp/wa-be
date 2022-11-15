@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -73,7 +74,7 @@ export class WhatsappClientController {
   @ApiOperation({
     summary: 'get WA client detail',
   })
-  async getClientDetail(@Param('id') id: number) {
+  async getClientDetail(@Param('id', ParseIntPipe) id: number) {
     // TODO : implementation
   }
 

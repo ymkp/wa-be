@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
+import { SmsModule } from './sms/sms.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { WhatsappModule } from './whatsapp/whatsapp.module';
       rootPath: join(__dirname, '..', 'public'),
     }),
     WhatsappModule,
+    SmsModule,
   ],
 })
 export class AppModule {}

@@ -27,7 +27,7 @@ export class JwtAuthStrategy extends PassportStrategy(
       throw new BadRequestException('Token tidak valid');
     return {
       id: payload.sub,
-      username: payload.username,
+      // username: payload.username,
     };
   }
 }
