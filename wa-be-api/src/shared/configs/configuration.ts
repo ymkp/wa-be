@@ -38,6 +38,9 @@ export default (): any => ({
     service: process.env.EMAIL_SERVICE,
     forgotPasswordURL: process.env.EMAIL_FORGOT_PASSWORD_URL,
   },
+  enc: {
+    iv: process.env.ENC_IV,
+  },
   defaultAdminUserPassword: process.env.DEFAULT_ADMIN_USER_PASSWORD,
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
   authBasicPassword: process.env.AUTH_BASIC_PASSWORD,

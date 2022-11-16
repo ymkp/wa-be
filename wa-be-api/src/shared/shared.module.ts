@@ -9,6 +9,7 @@ import { EmailModule } from './email';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { AppLoggerModule } from './logger/logger.module';
+import { EncryptService } from './signing/encrypt.service';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { AppLoggerModule } from './logger/logger.module';
   providers: [
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     JwtService,
+    EncryptService,
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,

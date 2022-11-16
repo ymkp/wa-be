@@ -3,20 +3,38 @@ import { ConfigService } from '@nestjs/config';
 import { plainToInstance } from 'class-transformer';
 import { AuthTokenOutput } from 'src/auth/dtos/auth-token-output.dto';
 import { RequestContext } from 'src/shared/request-context/request-context.dto';
+import { EncryptService } from 'src/shared/signing/encrypt.service';
 import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
 import { SMSClientRegisterInput } from '../dtos/sms-client-input.dto';
+import { SMSEventsGateway } from '../gateways/sms-events.gateway';
 import { SMSClientService } from './sms-client.service';
 
 @Injectable()
 export class SMSAuthService {
   constructor(
     private readonly signService: JwtSigningService,
-    private readonly configService: ConfigService,
+    // private readonly configService: ConfigService,
+    private readonly enc: EncryptService,
     private readonly clientService: SMSClientService,
+    private readonly gw: SMSEventsGateway,
   ) {}
   public async validateSMSClient(msisdn: string, password: string) {
     console.log('validate sms client : ', msisdn, password);
     return this.clientService.validateMSISDNPassword(msisdn, password);
+  }
+
+  public async testMessage(message: string): Promise<string> {
+    const msg = await this.enc.encryptString(message);
+    console.log({ msg });
+    this.gw.broadcastMessage(msg);
+    return msg;
+  }
+
+  public async decryptMsg(message: string): Promise<string> {
+    const msg = await this.enc.decryptString(message);
+    console.log({ msg });
+    this.gw.broadcastMessage(msg);
+    return msg;
   }
 
   public async login(
