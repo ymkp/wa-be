@@ -1,4 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class WhatsappConversationFilterInput {
@@ -10,6 +11,7 @@ export class WhatsappConversationFilterInput {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
   clientId: number;
 
   @ApiPropertyOptional()
