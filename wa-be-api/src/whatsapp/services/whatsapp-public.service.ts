@@ -33,14 +33,14 @@ export class WhatsappPublicService {
     clientId?: number,
   ): Promise<number> {
     // console.log('ctx content : ', ctx);
-    if (ctx.user.other.length === 0 && !ctx.user.terumbuKarang) {
+    if (ctx.user.other.length === 0 && !ctx.user.isSuperAdmin) {
       throw new BadRequestException(
         'Anda tidak memiliki permission untuk client',
       );
     }
     if (!clientId) {
       console.log('tidak ada client id');
-      if (ctx.user.terumbuKarang) {
+      if (ctx.user.isSuperAdmin) {
         const cs = await this.waCache.getClients();
         console.log('client di cache : ', cs);
         const csss = cs[Math.floor(Math.random() * cs.length)];

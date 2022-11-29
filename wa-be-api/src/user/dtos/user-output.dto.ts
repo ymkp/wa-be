@@ -24,33 +24,33 @@ export class UserOutput {
   @ApiProperty()
   identificationNo: string;
 
-  @Expose()
-  @ApiProperty()
-  divisiId: number;
+  // @Expose()
+  // @ApiProperty()
+  // divisiId: number;
 
-  @Expose()
-  @ApiProperty()
-  divisi: IdNameStringDTO;
+  // @Expose()
+  // @ApiProperty()
+  // divisi: IdNameStringDTO;
 
-  @Expose()
-  @ApiProperty()
-  biroId: number;
+  // @Expose()
+  // @ApiProperty()
+  // biroId: number;
 
-  @Expose()
-  @ApiProperty()
-  biro: IdNameStringDTO;
+  // @Expose()
+  // @ApiProperty()
+  // biro: IdNameStringDTO;
 
-  @Expose()
-  @ApiProperty()
-  bagianId: number;
+  // @Expose()
+  // @ApiProperty()
+  // bagianId: number;
 
-  @Expose()
-  @ApiProperty()
-  bagian: IdNameStringDTO;
+  // @Expose()
+  // @ApiProperty()
+  // bagian: IdNameStringDTO;
 
-  @Expose()
-  @ApiProperty()
-  divisiModeratorId: number;
+  // @Expose()
+  // @ApiProperty()
+  // divisiModeratorId: number;
 
   @Expose()
   @ApiProperty()
@@ -82,19 +82,4 @@ export class UserOutputMini {
   @Expose()
   @ApiProperty()
   identificationNo: string;
-
-  @Expose()
-  @ApiProperty()
-  @Transform(({ value }) => value?.name ?? null, { toClassOnly: true })
-  divisi: string;
-
-  @Expose()
-  @ApiProperty()
-  @Transform(({ value }) => value?.name ?? null, { toClassOnly: true })
-  biro: string;
-
-  @Expose()
-  @ApiProperty()
-  @Transform(({ value }) => value?.name ?? null, { toClassOnly: true })
-  bagian: string;
 }

@@ -6,7 +6,6 @@ import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { ReqContext } from 'src/shared/request-context/req-context.decorator';
 import { RequestContext } from 'src/shared/request-context/request-context.dto';
 import { SMSClientRegisterInput } from '../dtos/sms-client-input.dto';
-import { SMSLocalAuthGuard } from '../guards/sms-local-auth.guard';
 import { SMSAuthService } from '../services/sms-auth.service';
 
 @ApiTags('sms-auth')

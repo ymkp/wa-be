@@ -38,10 +38,15 @@ export class WhatsappMessageController {
     summary: 'get list of WA messages registered on the system',
   })
   async getMessages(
+    @ReqContext() ctx: RequestContext,
     @Query() paginationQ: PaginationParamsDto,
     @Query() filterQ: WhatsappMessageFilterInput,
   ): Promise<BaseApiResponse<WhatsappMessageOutputDTOMini[]>> {
-    return await this.service.getMessageWithPagination(paginationQ, filterQ);
+    return await this.service.getMessageWithPagination(
+      ctx,
+      paginationQ,
+      filterQ,
+    );
   }
 
   @Post('/new/text')

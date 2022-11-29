@@ -25,7 +25,7 @@ export class UserAccessTokenClaims {
   type?: string;
 
   @Expose()
-  terumbuKarang?: boolean;
+  isSuperAdmin?: boolean;
 }
 
 export class UserRefreshTokenClaims {

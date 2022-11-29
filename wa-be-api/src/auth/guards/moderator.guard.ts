@@ -12,7 +12,7 @@ export class ModeratorGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const { user } = context.switchToHttp().getRequest();
     const userAccount = await this.userService.getUserById(null, user.id);
-    if (userAccount.divisiModeratorId || userAccount.isSuperAdmin) {
+    if (userAccount.isSuperAdmin) {
       return true;
     }
 

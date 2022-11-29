@@ -7,9 +7,9 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { WHATSAPP_MESSAGE_QUEUE_STATUS } from '../constants/whatsapp-message-queue-status.constant';
+import { SMS_DELIVERY_STATUS } from '../constants/sms-message-status.const';
 
-export class CreateWhatsappMessageInput {
+export class SMSMessageCreateInputDTO {
   @ApiPropertyOptional()
   @IsNumber()
   @IsOptional()
@@ -18,51 +18,42 @@ export class CreateWhatsappMessageInput {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  content: string;
+  message: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  contactMsisdn: string;
+  to: string;
 }
 
-export class WhatsappMessageFilterInput {
+export class SMSMessageFilterQ {
   @ApiPropertyOptional()
   @IsNumber()
-  @IsOptional()
   @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
+  @IsOptional()
   clientId: number;
 
   @ApiPropertyOptional()
   @IsNumber()
-  @IsOptional()
   @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
+  @IsOptional()
+  contactId: number;
+
+  @ApiPropertyOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
+  @IsOptional()
   createdById: number;
 
   @ApiPropertyOptional()
-  @IsEnum(WHATSAPP_MESSAGE_QUEUE_STATUS)
+  @IsEnum(SMS_DELIVERY_STATUS)
   @IsOptional()
-  status: WHATSAPP_MESSAGE_QUEUE_STATUS;
+  status: SMS_DELIVERY_STATUS;
 }
 
-export class WhatsappTestMessageTextInput {
-  @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  nOfTimes: number;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  token: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  seed: string;
-
+export class SMSMessageFilterForWorkerQ {
   @ApiPropertyOptional()
-  @IsString()
+  @IsEnum(SMS_DELIVERY_STATUS)
   @IsOptional()
-  msisdn: string;
+  status: SMS_DELIVERY_STATUS;
 }

@@ -11,9 +11,7 @@ import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
 import { EncryptService } from 'src/shared/signing/encrypt.service';
-import { json } from 'stream/consumers';
 import { PhoneSocketRegisterInput } from '../dtos/phone-socket.dto';
-import { PhoneRegisterInputPipe } from '../pipes/phone-register-input.pipe';
 
 // FIXME : Data validation!!
 @WebSocketGateway({
@@ -32,15 +30,11 @@ export class SMSEventsGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: string,
   ): Promise<WsResponse<any>> {
-    // console.log('CLIENT----------------');
-    // console.log(client.id);
-    // console.log('---------END OF CLIENT');
     const msg = await this.enc.decryptString(data);
-    console.log({ data, msg });
     try {
       const input = this.transformData(PhoneSocketRegisterInput, msg);
       if (input.id) {
-        console.log(input);
+        console.log('input register phone ok : ', input);
         return { event: 'register', data: JSON.stringify(input) };
       } else {
         console.log('input doesnt have ID');
@@ -66,10 +60,7 @@ export class SMSEventsGateway {
   }
 
   broadcastMessage(message: string) {
-    // socket.join('aRoom');
     this.server.emit('message', message);
-    // socket.emit('message', message);
-    // return { event: 'roomCreated', room: 'aRoom' };
   }
 
   createARoom(@ConnectedSocket() socket: Socket) {
@@ -83,6 +74,9 @@ export class SMSEventsGateway {
     console.log(data);
     console.log('--------------END OF INPUT');
     const jsonData = JSON.parse(data);
+    console.log('json data? : ', jsonData);
+    console.log('-----------------------');
+
     return plainToInstance(cls, jsonData);
   }
 }

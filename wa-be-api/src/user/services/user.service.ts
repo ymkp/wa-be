@@ -124,7 +124,6 @@ export class UserService {
   async getUserById(ctx: RequestContext, id: number): Promise<UserOutput> {
     const user = await this.repository.findOneOrFail({
       where: { id },
-      relations: ['divisi', 'bagian'],
     });
     return plainToInstance(UserOutput, user);
   }
@@ -257,7 +256,7 @@ export class UserService {
       sub: input.id,
       other: input.clientIds,
       type: 'wa-user',
-      terumbuKarang: input.isSuperAdmin,
+      isSuperAdmin: input.isSuperAdmin,
     };
 
     console.log(payload);

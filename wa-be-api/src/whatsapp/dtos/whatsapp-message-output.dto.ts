@@ -1,29 +1,32 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
+import { UserOutputMini } from 'src/user/dtos/user-output.dto';
 import { WhatsappContactOutputDTO } from './whatsapp-contact-output.dto';
 import { WhatsappContentOutputDTO } from './whatsapp-content-output.dto';
 
 @Exclude()
 export class WhatsappMessageOutputDTOMini {
   @Expose()
-  @ApiProperty()
   id: number;
 
   @Expose()
-  @ApiProperty()
   status: string;
 
   @Expose()
-  @ApiProperty()
   @Transform(({ value }) => value?.msisdn ?? '', { toClassOnly: true })
   contact: string;
 
   @Expose()
+  @Type(() => WhatsappContactOutputDTO)
+  client: WhatsappContactOutputDTO;
+
+  @Expose()
+  @Type(() => UserOutputMini)
+  createdBy: UserOutputMini;
+
+  @Expose()
   @ApiProperty()
-  @Transform(
-    ({ value }) => (value?.content ? value?.content.substring(0, 50) : ''),
-    { toClassOnly: true },
-  )
+  @Transform(({ value }) => value?.content, { toClassOnly: true })
   content: string;
 
   @Expose()

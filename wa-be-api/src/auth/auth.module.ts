@@ -11,6 +11,7 @@ import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { JWTSMSAuthStrategy } from './strategies/jwt-sms-auth.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { WAClientTokenStrategy } from './strategies/wa-token.strategy';
 
@@ -26,6 +27,7 @@ import { WAClientTokenStrategy } from './strategies/wa-token.strategy';
     LocalStrategy,
     JwtAuthStrategy,
     JwtRefreshStrategy,
+    JWTSMSAuthStrategy,
     WAClientTokenStrategy,
     JwtSigningService,
   ],

@@ -57,10 +57,7 @@ export class SMSAuthService {
   refreshToken() {}
 
   getAuthToken(id: number): AuthTokenOutput {
-    const subject = { sub: id };
-    const payload = {
-      sub: id,
-    };
+    const subject = { sub: 0, clientId: id };
     const authToken = {
       refreshToken: '',
       accessToken: this.signService.signPayload(

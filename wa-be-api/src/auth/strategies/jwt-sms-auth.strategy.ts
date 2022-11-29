@@ -3,20 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { createRequestContext } from '../../shared/request-context/util';
-import {
-  STRATEGY_LOCAL,
-  STRATEGY_WA_TOKEN,
-} from '../constants/strategy.constant';
+import { STRATEGY_JWT_SMS_AUTH } from '../constants/strategy.constant';
 import { UserAccessTokenClaims } from '../dtos/auth-token-output.dto';
-import { AuthService } from '../services/auth.service';
 
 @Injectable()
-export class WAClientTokenStrategy extends PassportStrategy(
+export class JWTSMSAuthStrategy extends PassportStrategy(
   Strategy,
-  STRATEGY_WA_TOKEN,
+  STRATEGY_JWT_SMS_AUTH,
 ) {
-  constructor(private configService: ConfigService) {
+  constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: configService.get<string>('jwt.publicKey'),
@@ -28,16 +23,10 @@ export class WAClientTokenStrategy extends PassportStrategy(
   async validate(payload: any): Promise<UserAccessTokenClaims> {
     // Passport automatically creates a user object, based on the value we return from the validate() method,
     // and assigns it to the Request object as req.user
-    if (payload.other && payload.type) {
-      return {
-        id: payload.sub,
-        username: payload.username,
-        other: payload.other,
-        type: payload.type,
-        isSuperAdmin: payload.isSuperAdmin,
-      };
-    } else {
+    if (payload.type || payload.other || payload.sub > 0)
       throw new BadRequestException('Token tidak valid');
-    }
+    return {
+      id: payload.clientId,
+    };
   }
 }

@@ -16,21 +16,12 @@ export class SMSClientOutputDTO {
   @Expose()
   @ApiProperty()
   id: number;
-}
 
-export class SMSClientSendMessageDTO {
+  @Expose()
   @ApiProperty()
-  @IsNumber()
-  @IsNotEmpty()
-  senderId: number;
+  name: string;
 
+  @Expose()
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  to: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  message: string;
+  msisdn: string;
 }

@@ -9,14 +9,14 @@ import { SMSClientRepository } from '../repositories/sms-client.repository';
 
 @Injectable()
 export class SMSClientService {
-  constructor(private readonly repository: SMSClientRepository) {}
+  constructor(private readonly clientRepo: SMSClientRepository) {}
 
   async validateMSISDNPassword(
     msisdn: string,
     password: string,
   ): Promise<SMSClientOutputDTO> {
     console.log('validateMSISDNPassword', msisdn, password);
-    const client = await this.repository.findOne({
+    const client = await this.clientRepo.findOne({
       where: { msisdn },
     });
     if (!client) throw new UnauthorizedException();
@@ -29,10 +29,24 @@ export class SMSClientService {
   async createSMSClient(input: SMSClientRegisterInput) {
     const client = plainToInstance(SMSClient, input);
     client.password = await hash(input.password, 10);
-    await this.repository.save(client);
+    await this.clientRepo.save(client);
   }
 
-  async getMe(ctx: RequestContext): Promise<SMSClient> {
-    return await this.repository.getById(ctx.user.id);
+  async getMe(ctx: RequestContext): Promise<SMSClientOutputDTO> {
+    const c = await this.clientRepo.findOne({
+      where: { id: ctx.user.id },
+      select: ['id', 'name', 'msisdn'],
+    });
+    return c;
+  }
+
+  public async getClient(id?: number): Promise<SMSClient> {
+    let client: SMSClient;
+    if (id) {
+      client = await this.clientRepo.getById(id);
+    } else {
+      // FIXME : get random active client
+    }
+    return client;
   }
 }

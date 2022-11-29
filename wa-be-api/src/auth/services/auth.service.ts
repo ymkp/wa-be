@@ -78,15 +78,15 @@ export class AuthService {
     ctx: RequestContext,
     input: RegisterInput,
   ): Promise<RegisterOutput> {
-    const requestor = await this.userService.getByContext(ctx);
-    if (!requestor.isSuperAdmin) throw new UnauthorizedException();
+    console.log(ctx.user);
+    if (!ctx.user.isSuperAdmin) throw new UnauthorizedException();
     input.isAccountDisabled = false;
     if (!input.password) {
       input.password = await this.createRandomPassword(input.email);
     }
     const registeredUser = await this.userService.createUser(ctx, input);
 
-    await this.sendSetPasswordEmail(input.email);
+    // await this.sendSetPasswordEmail(input.email);
     return plainToInstance(RegisterOutput, registeredUser, {
       excludeExtraneousValues: true,
     });
@@ -101,11 +101,11 @@ export class AuthService {
     return this.getAuthToken(user);
   }
 
-  getAuthToken(user: UserAccessTokenClaims | UserOutput): AuthTokenOutput {
-    const subject = { sub: user.id };
+  getAuthToken(user: UserAccessTokenClaims): AuthTokenOutput {
+    const subject = { sub: user.id, isSuperAdmin: user.isSuperAdmin };
     const payload = {
-      username: user.username,
       sub: user.id,
+      isSuperAdmin: user.isSuperAdmin,
     };
     const authToken = {
       refreshToken: this.signService.signPayload(subject, {

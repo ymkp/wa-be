@@ -1,11 +1,18 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
+import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import { ReqContext } from 'src/shared/request-context/req-context.decorator';
 import { RequestContext } from 'src/shared/request-context/request-context.dto';
-import { SMSClientSendMessageDTO } from '../dtos/sms-client-output.dto';
-import { SMSClient } from '../entities/sms-client.entity';
-import { SMSClientService } from '../services/sms-client.service';
+import {
+  SMSMessageCreateInputDTO,
+  SMSMessageFilterQ,
+} from '../dtos/sms-message-input.dto';
+import {
+  SMSMessageDetailDTO,
+  SMSMessageMiniDTO,
+} from '../dtos/sms-message-output.dto';
 import { SMSMessageService } from '../services/sms-message.service';
 
 @ApiTags('sms-message')
@@ -21,8 +28,19 @@ export class SMSMessageController {
   })
   public async sendMessage(
     @ReqContext() ctx: RequestContext,
-    @Body() body: SMSClientSendMessageDTO,
-  ): Promise<void> {
-    await this.service.sendMessage(body);
+    @Body() body: SMSMessageCreateInputDTO,
+  ): Promise<SMSMessageDetailDTO> {
+    return await this.service.sendMessage(ctx, body);
+  }
+
+  @Get('sms')
+  @ApiOperation({
+    summary: 'get sms message',
+  })
+  public async getMessagesWithPagination(
+    @Query() pageQ: PaginationParamsDto,
+    @Query() filterQ: SMSMessageFilterQ,
+  ): Promise<BaseApiResponse<SMSMessageMiniDTO[]>> {
+    return await this.service.getMessagesWithPagination(pageQ, filterQ);
   }
 }
