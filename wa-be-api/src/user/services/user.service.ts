@@ -8,7 +8,10 @@ import { compare, hash } from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { RegisterInput } from 'src/auth/dtos/auth-register-input.dto';
 import { AuthTokenOutput } from 'src/auth/dtos/auth-token-output.dto';
+import { MultipleIdsToSingleEntityInput } from 'src/shared/dtos/id-value-input.dto';
 import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
+import { WhatsappClientRepository } from 'src/whatsapp/repositories/whatsapp-client.repository';
+import { WhatsappPublicTokenRepository } from 'src/whatsapp/repositories/whatsapp-public-token.repository';
 import { In } from 'typeorm';
 
 import { RequestContext } from '../../shared/request-context/request-context.dto';
@@ -19,7 +22,11 @@ import {
   UserFilterInput,
 } from '../dtos/user-input.dto';
 
-import { UserOutput, UserOutputMini } from '../dtos/user-output.dto';
+import {
+  UserOutput,
+  UserOutputDetailDTO,
+  UserOutputMini,
+} from '../dtos/user-output.dto';
 import { User } from '../entities/user.entity';
 import { UserRepository } from '../repositories/user.repository';
 
@@ -28,6 +35,8 @@ export class UserService {
   constructor(
     private readonly repository: UserRepository,
     private readonly signService: JwtSigningService,
+    private readonly waClientRepo: WhatsappClientRepository,
+    private readonly waPublicTokenRepo: WhatsappPublicTokenRepository,
   ) {}
 
   async countUser(): Promise<number> {
@@ -121,11 +130,15 @@ export class UserService {
     });
   }
 
-  async getUserById(ctx: RequestContext, id: number): Promise<UserOutput> {
+  async getUserById(
+    ctx: RequestContext,
+    id: number,
+  ): Promise<UserOutputDetailDTO> {
     const user = await this.repository.findOneOrFail({
       where: { id },
+      relations: ['permittedClients', 'permittedSMSs'],
     });
-    return plainToInstance(UserOutput, user);
+    return plainToInstance(UserOutputDetailDTO, user);
   }
 
   async findByUsername(
@@ -156,13 +169,24 @@ export class UserService {
     if (loggedInUser.isSuperAdmin || loggedInUser.id === input.id) {
       const user = await this.repository.getById(input.id);
       // merges the input (2nd line) to the found user (1st line)
-      const updatedUser: User = {
-        ...user,
-        ...plainToInstance(User, input),
-      };
-      await this.repository.save(updatedUser);
+      if (input.name) user.name = input.name;
+      if (input.username) user.username = input.username;
+      if (input.email) user.email = input.email;
+      if (input.identificationNo)
+        user.identificationNo = input.identificationNo;
 
-      return plainToInstance(UserOutput, updatedUser);
+      if (loggedInUser.isSuperAdmin) {
+        if (input.isAccountDisabled != undefined)
+          user.isAccountDisabled = input.isAccountDisabled;
+        if (loggedInUser.id != input.id) {
+          if (input.isSuperAdmin != undefined)
+            user.isSuperAdmin = input.isSuperAdmin;
+        }
+      }
+
+      await this.repository.save(user);
+
+      return plainToInstance(UserOutput, user);
     } else {
       throw new UnauthorizedException();
     }
@@ -196,6 +220,15 @@ export class UserService {
     } else {
       throw new UnauthorizedException();
     }
+  }
+
+  public async setWhatsappClient(input: MultipleIdsToSingleEntityInput) {
+    const user = await this.repository.getById(input.entityId);
+    const clients = await this.waClientRepo.find({
+      where: { id: In(input.ids) },
+    });
+    user.permittedClients = clients;
+    await this.repository.save(user);
   }
 
   public async revokeSuperAdminFromUser(
@@ -236,11 +269,26 @@ export class UserService {
       },
     });
     const clientIds = user.permittedClients.map((c) => c.id);
+    const secret = Array(32)
+      .fill(null)
+      .map(() => Math.round(Math.random() * 16).toString(16))
+      .join('');
+    const token = await this.waPublicTokenRepo.findOne({
+      where: { userId: user.id },
+    });
+    if (!token) {
+      await this.waPublicTokenRepo.softDelete(token.id);
+    }
+    await this.waPublicTokenRepo.save({
+      user,
+      secret,
+    });
     return this.generateTokenWorker({
       id: user.id,
       identificationNo: user.identificationNo,
       clientIds,
       isSuperAdmin: user.isSuperAdmin,
+      secret,
     });
   }
 
@@ -249,17 +297,17 @@ export class UserService {
     identificationNo: string;
     clientIds: number[];
     isSuperAdmin: boolean;
+    secret: string;
   }): AuthTokenOutput {
     const subject = { sub: input.id };
     const payload = {
       username: input.identificationNo,
       sub: input.id,
-      other: input.clientIds,
+      other: input.secret,
       type: 'wa-user',
       isSuperAdmin: input.isSuperAdmin,
     };
 
-    console.log(payload);
     const authToken = {
       refreshToken: '',
       accessToken: this.signService.signPayload({ ...payload, ...subject }),

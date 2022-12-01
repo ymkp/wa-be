@@ -28,8 +28,7 @@ export class SMSClient {
   @Column({ default: true })
   isActive: boolean;
 
-  @ManyToMany(() => User)
-  @JoinTable()
+  @ManyToMany(() => User, (d) => d.permittedSMSs)
   permittedUsers: User[];
 
   @CreateDateColumn({ name: 'createdAt', nullable: true })

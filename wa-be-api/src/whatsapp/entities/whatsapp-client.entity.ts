@@ -2,6 +2,7 @@ import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -39,8 +40,7 @@ export class WhatsappClient {
   })
   status: WHATSAPP_CLIENT_STATUS;
 
-  @ManyToMany(() => User)
-  @JoinTable()
+  @ManyToMany(() => User, (d) => d.permittedClients)
   permittedUsers: User[];
 
   @CreateDateColumn({ name: 'createdAt', nullable: true })
@@ -48,4 +48,7 @@ export class WhatsappClient {
 
   @UpdateDateColumn({ name: 'updatedAt', nullable: true })
   updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deletedAt', nullable: true })
+  deletedAt: Date;
 }

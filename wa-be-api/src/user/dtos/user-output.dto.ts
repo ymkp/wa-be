@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose, Transform } from 'class-transformer';
-import { IdNameStringDTO } from 'src/shared/dtos/id-value-response.dto';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
+import { SMSClientOutputDTO } from 'src/sms/dtos/sms-client-output.dto';
+import { WhatsappClientOutputDTO } from 'src/whatsapp/dtos/whatsapp-client-output.dto';
 
 @Exclude()
 export class UserOutput {
@@ -24,33 +25,44 @@ export class UserOutput {
   @ApiProperty()
   identificationNo: string;
 
-  // @Expose()
-  // @ApiProperty()
-  // divisiId: number;
+  @Expose()
+  @ApiProperty()
+  isAccountDisabled: boolean;
 
-  // @Expose()
-  // @ApiProperty()
-  // divisi: IdNameStringDTO;
+  @Expose()
+  @ApiProperty()
+  isSuperAdmin: boolean;
 
-  // @Expose()
-  // @ApiProperty()
-  // biroId: number;
+  @Expose()
+  @ApiProperty()
+  createdAt: string;
 
-  // @Expose()
-  // @ApiProperty()
-  // biro: IdNameStringDTO;
+  @Expose()
+  @ApiProperty()
+  updatedAt: string;
+}
 
-  // @Expose()
-  // @ApiProperty()
-  // bagianId: number;
+@Exclude()
+export class UserOutputDetailDTO {
+  @Expose()
+  @ApiProperty()
+  id: number;
 
-  // @Expose()
-  // @ApiProperty()
-  // bagian: IdNameStringDTO;
+  @Expose()
+  @ApiProperty()
+  name: string;
 
-  // @Expose()
-  // @ApiProperty()
-  // divisiModeratorId: number;
+  @Expose()
+  @ApiProperty()
+  username: string;
+
+  @Expose()
+  @ApiProperty()
+  email: string;
+
+  @Expose()
+  @ApiProperty()
+  identificationNo: string;
 
   @Expose()
   @ApiProperty()
@@ -59,6 +71,16 @@ export class UserOutput {
   @Expose()
   @ApiProperty()
   isSuperAdmin: boolean;
+
+  @Expose()
+  @ApiProperty()
+  @Type(() => WhatsappClientOutputDTO)
+  permittedClients: WhatsappClientOutputDTO[];
+
+  @Expose()
+  @ApiProperty()
+  @Type(() => SMSClientOutputDTO)
+  permittedSMSs: SMSClientOutputDTO[];
 
   @Expose()
   @ApiProperty()

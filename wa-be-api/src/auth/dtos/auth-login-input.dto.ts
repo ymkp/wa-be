@@ -25,3 +25,10 @@ export class EmailConfirmationBody {
   @IsString()
   password: string;
 }
+
+export class EmailInput {
+  @IsNotEmpty()
+  @ApiProperty()
+  @IsString()
+  email: string;
+}

@@ -85,8 +85,8 @@ export class AuthService {
       input.password = await this.createRandomPassword(input.email);
     }
     const registeredUser = await this.userService.createUser(ctx, input);
+    await this.sendSetPasswordEmail(input.email);
 
-    // await this.sendSetPasswordEmail(input.email);
     return plainToInstance(RegisterOutput, registeredUser, {
       excludeExtraneousValues: true,
     });

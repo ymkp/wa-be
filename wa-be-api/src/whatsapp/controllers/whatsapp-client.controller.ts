@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { SuperAdminGuard } from 'src/auth/guards/superadmin.guard';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import {
@@ -46,8 +47,8 @@ export class WhatsappClientController {
   })
   async createAClient(
     @Body() body: WhatsappClientInputRegister,
-  ): Promise<void> {
-    await this.waClientService.createWAClient(body);
+  ): Promise<WhatsappClientOutputDTO> {
+    return await this.waClientService.createWAClient(body);
   }
 
   @Patch('')
@@ -64,18 +65,32 @@ export class WhatsappClientController {
     await this.waClientService.loginWAWorkerPublic(body);
   }
 
-  @Delete('/:id')
-  @ApiOperation({ summary: 'NOT-YET-IMPLEMENTED soft delete a WA client' })
-  async freezeAClient() {
-    // TODO : implementation
+  @Patch('deactivate/:id')
+  @ApiOperation({ summary: 'deactive a WA client' })
+  @UseGuards(SuperAdminGuard)
+  async freezeAClient(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<WhatsappClientOutputDTO> {
+    return await this.waClientService.freezeAClient(id);
+  }
+
+  @Patch('restore/:id')
+  @ApiOperation({ summary: 'restore a WA client' })
+  @UseGuards(SuperAdminGuard)
+  async restoreAClient(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<WhatsappClientOutputDTO> {
+    return await this.waClientService.restoreAClient(id);
   }
 
   @Get('/detail/:id')
   @ApiOperation({
     summary: 'get WA client detail',
   })
-  async getClientDetail(@Param('id', ParseIntPipe) id: number) {
-    // TODO : implementation
+  async getClientDetail(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<WhatsappClientOutputDTO> {
+    return await this.waClientService.getClientDetail(id);
   }
 
   @Post('/qrcode/request')

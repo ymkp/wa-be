@@ -110,16 +110,6 @@ export class UserEditBody {
   @IsBoolean()
   @IsOptional()
   isSuperAdmin: boolean;
-
-  @ApiPropertyOptional()
-  @IsDateString()
-  @IsOptional()
-  createdAt: string;
-
-  @ApiPropertyOptional()
-  @IsDateString()
-  @IsOptional()
-  updatedAt: string;
 }
 
 export class UserEditPasswordBody {

@@ -1,3 +1,4 @@
+import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   ConnectedSocket,
   MessageBody,
@@ -78,5 +79,22 @@ export class SMSEventsGateway {
     console.log('-----------------------');
 
     return plainToInstance(cls, jsonData);
+  }
+
+  @SubscribeMessage('ping')
+  onPing(@MessageBody() data: any, @ConnectedSocket() socket: Socket) {
+    console.log('listeners : ', socket.listenerCount('ping'));
+    console.log(socket.client.conn);
+    console.log(socket.listeners.toString());
+    console.log('ping? ', data);
+  }
+
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  private async ping() {
+    console.log('ping 30 secs');
+    // TODO : ack socket
+    // this.server.emit('ping', 'ping', (res: any) => {
+    //   console.log('response ? ', res);
+    // });
   }
 }

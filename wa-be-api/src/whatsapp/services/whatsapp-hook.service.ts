@@ -14,6 +14,7 @@ export class WhatsappHookService {
   ) {}
 
   public async workerInit(body: HookWorkerInitDTO): Promise<void> {
+    console.log('wa hook service : worker init');
     await this.clientService.workerInitFromHook(parseInt(body.port, 10));
   }
   public async receiveMessage(body: HookReceivedMessageDTO): Promise<void> {

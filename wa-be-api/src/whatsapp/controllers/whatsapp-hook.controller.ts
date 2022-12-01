@@ -17,6 +17,7 @@ export class WhatsappHookController {
     summary: 'hook - after worker successfully built',
   })
   async workerInit(@Body() body: HookWorkerInitDTO): Promise<void> {
+    console.log('hook - after worker successfully built');
     await this.hookService.workerInit(body);
   }
 

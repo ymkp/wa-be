@@ -130,22 +130,27 @@ export class WHatsappSchedulerService implements OnModuleInit, OnModuleDestroy {
     msg: WhatsappMessage,
   ): Promise<void> {
     const c = await this.cacheService.getTokenFromClientId(msg.clientId);
-    //  FIXME : caching status client
-    // if (c.status && c.status === WHATSAPP_CLIENT_STATUS.ACTIVE) {
-    if (msg.content.type === WHATSAPP_MESSAGE_CONTENT_TYPE.TEXT) {
-      const msgid = await this.workerAPI.sendTextMessage(
-        msg.clientId,
-        msg.content.content,
-        msg.contact.msisdn,
-        c.fullUrl,
-        c.token,
-      );
-      msg.status = WHATSAPP_MESSAGE_QUEUE_STATUS.SENT;
-      msg.messageId = msgid;
-      await this.messageRepo.save(msg);
+    if (c) {
+      //  FIXME : caching status client
+      // if (c.status && c.status === WHATSAPP_CLIENT_STATUS.ACTIVE) {
+      if (msg.content.type === WHATSAPP_MESSAGE_CONTENT_TYPE.TEXT) {
+        const msgid = await this.workerAPI.sendTextMessage(
+          msg.clientId,
+          msg.content.content,
+          msg.contact.msisdn,
+          c.fullUrl,
+          c.token,
+        );
+        msg.status = WHATSAPP_MESSAGE_QUEUE_STATUS.SENT;
+        msg.messageId = msgid;
+        await this.messageRepo.save(msg);
+      } else {
+        throw new BadRequestException();
+      }
     } else {
-      throw new BadRequestException();
+      console.log(msg.clientId, 'tidak ditemukan di CACHE');
     }
+
     // } else {
     //   console.log('cache : ', c);
     //   throw new BadRequestException('client tidak siap untuk mengirim pesan');

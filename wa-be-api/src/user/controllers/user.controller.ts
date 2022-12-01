@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthTokenOutput } from 'src/auth/dtos/auth-token-output.dto';
 import { SuperAdminGuard } from 'src/auth/guards/superadmin.guard';
+import { MultipleIdsToSingleEntityInput } from 'src/shared/dtos/id-value-input.dto';
 import { IdValNumberDTO } from 'src/shared/dtos/id-value-response.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import {
@@ -35,7 +36,11 @@ import {
   UserEditPasswordBody,
   UserFilterInput,
 } from '../dtos/user-input.dto';
-import { UserOutput, UserOutputMini } from '../dtos/user-output.dto';
+import {
+  UserOutput,
+  UserOutputDetailDTO,
+  UserOutputMini,
+} from '../dtos/user-output.dto';
 import { UserService } from '../services/user.service';
 
 @ApiTags('users')
@@ -98,16 +103,15 @@ export class UserController {
     return { id: 0, value };
   }
 
-  // TODO: ADD RoleGuard
-  // NOTE : This can be made a admin only endpoint. For normal users they can use GET /me
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
+  @UseGuards(SuperAdminGuard)
   @ApiOperation({
     summary: 'Get user by id API',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    type: SwaggerBaseApiResponse(UserOutput),
+    type: SwaggerBaseApiResponse(UserOutputDetailDTO),
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -116,9 +120,9 @@ export class UserController {
   async getUser(
     @ReqContext() ctx: RequestContext,
     @Param('id') id: number,
-  ): Promise<BaseApiResponse<UserOutput>> {
+  ): Promise<UserOutputDetailDTO> {
     const user = await this.userService.getUserById(ctx, id);
-    return { data: user, meta: {} };
+    return user;
   }
 
   // NOTE : This can be made a admin only endpoint. For normal users they can use PATCH /me
@@ -141,6 +145,18 @@ export class UserController {
   ): Promise<BaseApiResponse<UserOutput>> {
     const user = await this.userService.updateUser(ctx, input);
     return { data: user, meta: {} };
+  }
+
+  @Post('client-permission')
+  @ApiOperation({
+    summary: 'set whatsapp clients for user',
+  })
+  @UseGuards(SuperAdminGuard)
+  async setWhatsappClients(
+    @Body() body: MultipleIdsToSingleEntityInput,
+  ): Promise<BaseApiResponse<string>> {
+    await this.userService.setWhatsappClient(body);
+    return { data: 'ok' };
   }
 
   @Patch('edit/password')

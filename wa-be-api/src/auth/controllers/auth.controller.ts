@@ -13,6 +13,7 @@ import {
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiProperty,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -27,6 +28,7 @@ import { ReqContext } from '../../shared/request-context/req-context.decorator';
 import { RequestContext } from '../../shared/request-context/request-context.dto';
 import {
   EmailConfirmationBody,
+  EmailInput,
   LoginInput,
 } from '../dtos/auth-login-input.dto';
 import { RefreshTokenInput } from '../dtos/auth-refresh-token-input.dto';
@@ -123,8 +125,9 @@ export class AuthController {
   public async grantSuperAdmin(
     @ReqContext() ctx: RequestContext,
     @Body() body: MultipleIdsToSingleEntityInput,
-  ): Promise<void> {
+  ): Promise<BaseApiResponse<string>> {
     await this.authService.grantSuperAdminToUser(ctx, body.ids);
+    return { data: 'ok' };
   }
 
   @Post('revoke-super-admin')
@@ -136,16 +139,20 @@ export class AuthController {
   public async revokeSuperAdmin(
     @ReqContext() ctx: RequestContext,
     @Body() body: MultipleIdsToSingleEntityInput,
-  ): Promise<void> {
+  ): Promise<BaseApiResponse<string>> {
     await this.authService.revokeSuperAdminFromUser(ctx, body.ids);
+    return { data: 'ok' };
   }
 
   @Post('logout')
   @ApiOperation({
     summary: 'logout',
   })
-  public async logout(@ReqContext() ctx: RequestContext): Promise<void> {
-    return await this.authService.logout(ctx);
+  public async logout(
+    @ReqContext() ctx: RequestContext,
+  ): Promise<BaseApiResponse<string>> {
+    await this.authService.logout(ctx);
+    return { data: 'ok' };
   }
 
   @Post('get-sso-token')
@@ -186,7 +193,7 @@ export class AuthController {
   @UseInterceptors(ClassSerializerInterceptor)
   async changeForgottenPassword(
     @Body() confirmationData: EmailConfirmationBody,
-  ): Promise<void> {
+  ): Promise<BaseApiResponse<string>> {
     const email = await this.authService.decodeConfirmationToken(
       confirmationData.token,
     );
@@ -194,10 +201,17 @@ export class AuthController {
       email,
       confirmationData.password,
     );
+    return { data: 'ok' };
   }
 
   @Post('request-forget-password')
-  async requestForgetPassword(@Body() input: { email: string }): Promise<void> {
+  @ApiOperation({
+    summary: 'request password',
+  })
+  async requestForgetPassword(
+    @Body() input: EmailInput,
+  ): Promise<BaseApiResponse<string>> {
     await this.authService.requestForgetPassword(input.email);
+    return { data: 'ok' };
   }
 }

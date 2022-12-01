@@ -3,6 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
+import { TypeOrmExModule } from 'src/shared/typeorm-ex.module';
+import { WhatsappPublicTokenRepository } from 'src/whatsapp/repositories/whatsapp-public-token.repository';
+import { WhatsappPublicUsageRepository } from 'src/whatsapp/repositories/whatsapp-public-usage.repository';
 
 import { SharedModule } from '../shared/shared.module';
 import { UserModule } from '../user/user.module';
@@ -20,6 +23,10 @@ import { WAClientTokenStrategy } from './strategies/wa-token.strategy';
     SharedModule,
     PassportModule.register({ defaultStrategy: STRATEGY_JWT_AUTH }),
     UserModule,
+    TypeOrmExModule.forCustomRepository([
+      WhatsappPublicTokenRepository,
+      WhatsappPublicUsageRepository,
+    ]),
   ],
   controllers: [AuthController],
   providers: [

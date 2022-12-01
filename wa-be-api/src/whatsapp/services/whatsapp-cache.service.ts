@@ -9,14 +9,12 @@ import { Cache } from 'cache-manager';
 import { WHATSAPP_CLIENT_STATUS } from '../constants/whatsapp-client-status.constant';
 import { WhatsappCacheInfo } from '../dtos/whatsapp-cache.interface';
 import { WhatsappClientEntityInput } from '../dtos/whatsapp-client-input.dto';
-import { WhatsappClientRepository } from '../repositories/whatsapp-client.repository';
 
 @Injectable()
 export class WhatsappCacheService {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly configService: ConfigService,
-    private readonly clientRepo: WhatsappClientRepository,
   ) {
     this.workerURL = this.configService.get('waWorkerUrl');
   }
@@ -81,10 +79,18 @@ export class WhatsappCacheService {
     const clientIds = await this.getClients();
     clientIds.push(id);
     const ids = [...new Set(clientIds)];
+    console.log('cache : set : ', ids);
     await this.cacheManager.set('clients', ids);
   }
 
   public async getClients(): Promise<number[]> {
     return (await this.cacheManager.get<number[]>('clients')) ?? [];
+  }
+
+  public async deactiveAClient(id: number) {
+    const clientIds = await this.getClients();
+    const idx = clientIds.indexOf(id);
+    clientIds.splice(idx, 1);
+    await this.cacheManager.set('clients', clientIds);
   }
 }

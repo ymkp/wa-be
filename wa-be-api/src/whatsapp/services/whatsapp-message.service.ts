@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
@@ -17,6 +17,7 @@ import {
 import { WhatsappMessage } from '../entities/whatsapp-message.entity';
 import { WhatsappMessageContentRepository } from '../repositories/whatsapp-message-content.repository';
 import { WhatsappMessageRepository } from '../repositories/whatsapp-message.entity';
+import { WhatsappCLientService } from './whatsapp-client.service';
 import { WHatsappSchedulerService } from './whatsapp-scheduler.service';
 import { WhatsappContactService } from './whtasapp-contact.service';
 
@@ -26,6 +27,7 @@ export class WhatsappMessageService {
     private readonly messageRepo: WhatsappMessageRepository,
     private readonly contentRepo: WhatsappMessageContentRepository,
     private readonly contactService: WhatsappContactService,
+    private readonly clientService: WhatsappCLientService,
     private readonly schedulerService: WHatsappSchedulerService,
   ) {}
 
@@ -38,6 +40,11 @@ export class WhatsappMessageService {
     userId: number,
   ): Promise<WhatsappMessageOutputDTO> {
     // ? 1. get it on the queue
+    if (input.clientId) {
+      const client = await this.clientService.getClientById(input.clientId);
+      if (!client.isActive)
+        throw new BadRequestException('Client sedang tidak aktif');
+    }
     const contact = await this.contactService.getOrCreateContact(
       input.contactMsisdn,
     );

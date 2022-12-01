@@ -20,6 +20,8 @@ import { WhatsappConversationMessageRepository } from './repositories/whatsapp-c
 import { WhatsappConversationRepository } from './repositories/whatsapp-conversation.repository';
 import { WhatsappMessageContentRepository } from './repositories/whatsapp-message-content.repository';
 import { WhatsappMessageRepository } from './repositories/whatsapp-message.entity';
+import { WhatsappPublicTokenRepository } from './repositories/whatsapp-public-token.repository';
+import { WhatsappPublicUsageRepository } from './repositories/whatsapp-public-usage.repository';
 import { WhatsappCacheService } from './services/whatsapp-cache.service';
 import { WhatsappCLientService } from './services/whatsapp-client.service';
 import { WhatsappConversationService } from './services/whatsapp-conversation.service';
@@ -45,6 +47,8 @@ import { WhatsappContactService } from './services/whtasapp-contact.service';
       WhatsappConversationMessageRepository,
       WhatsappConversationMessageContentRepository,
       UserRepository,
+      WhatsappPublicTokenRepository,
+      WhatsappPublicUsageRepository,
     ]),
   ],
   providers: [
