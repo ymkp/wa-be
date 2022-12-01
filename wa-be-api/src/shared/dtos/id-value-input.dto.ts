@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayNotEmpty, IsNotEmpty, IsNumber } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class MultipleIdsToSingleEntityInput {
   @ApiProperty({ type: [Number] })
+  @IsArray()
   ids: number[];
 
   @ApiProperty()

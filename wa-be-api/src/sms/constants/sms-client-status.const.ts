@@ -1,0 +1,4 @@
+export enum SMS_CLIENT_STATUS {
+  ONLINE = 'ONLINE',
+  OFFLINE = 'OFFLINE',
+}

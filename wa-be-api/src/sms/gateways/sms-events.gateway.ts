@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   ConnectedSocket,
@@ -12,9 +13,12 @@ import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
 import { EncryptService } from 'src/shared/signing/encrypt.service';
-import { PhoneSocketRegisterInput } from '../dtos/phone-socket.dto';
+import {
+  PhoneInfoGW,
+  PhoneSocketRegisterInput,
+} from '../dtos/phone-socket.dto';
 
-// FIXME : Data validation!!
+@Injectable()
 @WebSocketGateway({
   // path: '/gw-sms',
   cors: {
@@ -23,6 +27,9 @@ import { PhoneSocketRegisterInput } from '../dtos/phone-socket.dto';
 })
 export class SMSEventsGateway {
   constructor(private readonly enc: EncryptService) {}
+
+  clients: PhoneInfoGW[] = [];
+
   @WebSocketServer()
   server: Server;
 
@@ -35,6 +42,7 @@ export class SMSEventsGateway {
     try {
       const input = this.transformData(PhoneSocketRegisterInput, msg);
       if (input.id) {
+        this.insertPhone(input);
         console.log('input register phone ok : ', input);
         return { event: 'register', data: JSON.stringify(input) };
       } else {
@@ -43,6 +51,30 @@ export class SMSEventsGateway {
     } catch (err) {
       console.log('ERR : ', err);
       return { event: 'register', data: 'failed' };
+    }
+  }
+
+  getAvailableCLients(): number[] {
+    const now = new Date(Date.now());
+    const ps = this.clients.filter((c) => {
+      const diff: number = now.getTime() - c.last.getTime();
+      const d = new Date(diff);
+      console.log(d.getMinutes());
+      return d.getMinutes() < 3;
+    });
+    return ps.map((p) => p.id);
+  }
+
+  private insertPhone(input: PhoneSocketRegisterInput) {
+    const idx = this.clients.findIndex((c) => c.id === input.id);
+    if (idx > -1) {
+      this.clients[idx].last = new Date(Date.now());
+    } else {
+      this.clients.push({
+        id: input.id,
+        msisdn: input.msisdn,
+        last: new Date(Date.now()),
+      });
     }
   }
 
@@ -81,20 +113,16 @@ export class SMSEventsGateway {
     return plainToInstance(cls, jsonData);
   }
 
-  @SubscribeMessage('ping')
-  onPing(@MessageBody() data: any, @ConnectedSocket() socket: Socket) {
-    console.log('listeners : ', socket.listenerCount('ping'));
-    console.log(socket.client.conn);
-    console.log(socket.listeners.toString());
-    console.log('ping? ', data);
+  @SubscribeMessage('pong')
+  onPing(@MessageBody() data: any): Promise<WsResponse<any>> {
+    console.log('pong? ', data);
+    return data;
   }
 
   @Cron(CronExpression.EVERY_30_SECONDS)
   private async ping() {
     console.log('ping 30 secs');
-    // TODO : ack socket
-    this.server.emit('ping', 'ping', (res: any) => {
-      console.log('response ? ', res);
-    });
+    const ids = this.getAvailableCLients();
+    this.server.emit('ping', ids);
   }
 }

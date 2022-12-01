@@ -9,6 +9,7 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { SMS_CLIENT_STATUS } from '../constants/sms-client-status.const';
 
 @Entity('sms_client')
 export class SMSClient {
@@ -27,6 +28,13 @@ export class SMSClient {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: SMS_CLIENT_STATUS,
+    default: SMS_CLIENT_STATUS.OFFLINE,
+  })
+  status: SMS_CLIENT_STATUS;
 
   @ManyToMany(() => User, (d) => d.permittedSMSs)
   permittedUsers: User[];

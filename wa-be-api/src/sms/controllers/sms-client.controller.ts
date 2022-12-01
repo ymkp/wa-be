@@ -1,6 +1,24 @@
-import { Body, Controller, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
+import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
+import { ReqContext } from 'src/shared/request-context/req-context.decorator';
+import { RequestContext } from 'src/shared/request-context/request-context.dto';
+import { SMSClientRegisterInput } from '../dtos/sms-client-input.dto';
+import {
+  SMSClientOutputDetailDTO,
+  SMSClientOutputDTO,
+} from '../dtos/sms-client-output.dto';
 import { SMSClientService } from '../services/sms-client.service';
 
 @ApiTags('sms-client')
@@ -9,4 +27,37 @@ import { SMSClientService } from '../services/sms-client.service';
 @ApiBearerAuth()
 export class SMSClientController {
   constructor(private readonly service: SMSClientService) {}
+
+  @Post('create')
+  @ApiOperation({
+    summary: 'sms client register',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async register(
+    @ReqContext() ctx: RequestContext,
+    @Body() body: SMSClientRegisterInput,
+  ) {
+    await this.service.createSMSClient(body);
+  }
+
+  @Get('get-all')
+  @ApiOperation({
+    summary: 'get all clients with paginations',
+  })
+  public async getClientsWithPagination(
+    @Query() paginationQ: PaginationParamsDto,
+  ): Promise<BaseApiResponse<SMSClientOutputDTO[]>> {
+    return await this.service.getClientsWithPagination(paginationQ);
+  }
+
+  @Get('detail/:id')
+  @ApiOperation({
+    summary: 'get client detail',
+  })
+  public async getClientDetail(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<SMSClientOutputDetailDTO> {
+    return await this.service.getClientDetail(id);
+  }
 }

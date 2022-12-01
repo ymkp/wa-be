@@ -22,3 +22,9 @@ export class PhoneSocketRegisterInput {
   @IsNotEmpty()
   imei: string;
 }
+
+export interface PhoneInfoGW {
+  id: number;
+  msisdn: string;
+  last: Date;
+}

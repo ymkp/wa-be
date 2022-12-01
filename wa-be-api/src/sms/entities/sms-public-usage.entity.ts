@@ -6,16 +6,16 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { WhatsappPublicToken } from './whatsapp-public-token.entity';
+import { SMSPublicToken } from './sms-public-token.entity';
 
-@Entity('whatsapp_public_usage')
-export class WhatsappPublicUsage {
+@Entity('sms_public_usage')
+export class SMSPublicUsage {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => WhatsappPublicToken)
+  @ManyToOne(() => SMSPublicToken)
   @JoinColumn()
-  token: WhatsappPublicToken;
+  token: SMSPublicToken;
 
   @Column()
   tokenId: number;

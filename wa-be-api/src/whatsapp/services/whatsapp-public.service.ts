@@ -39,7 +39,10 @@ export class WhatsappPublicService {
     body: CreateWhatsappMessageInput,
   ): Promise<WhatsappMessageOutputDTO> {
     await this.validateTokenAndRecordUsage(ctx);
-    body.clientId = await this.checkContext(ctx, body.clientId);
+    body.clientId = await this.getClientIdSuitableFromContext(
+      ctx,
+      body.clientId,
+    );
     try {
       return await this.waMessageService.addTextMessage(body, ctx.user.id);
     } catch (err) {
@@ -125,7 +128,7 @@ export class WhatsappPublicService {
   }
 
   // ? -------------------privates
-  private async checkContext(
+  private async getClientIdSuitableFromContext(
     ctx: RequestContext,
     clientId?: number,
   ): Promise<number> {

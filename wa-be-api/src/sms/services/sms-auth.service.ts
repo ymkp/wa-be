@@ -50,10 +50,6 @@ export class SMSAuthService {
 
   logout() {}
 
-  public async register(input: SMSClientRegisterInput) {
-    await this.clientService.createSMSClient(input);
-  }
-
   refreshToken() {}
 
   getAuthToken(id: number): AuthTokenOutput {

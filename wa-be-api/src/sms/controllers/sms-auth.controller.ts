@@ -54,19 +54,6 @@ export class SMSAuthController {
     return await this.authService.login(ctx, credential);
   }
 
-  @Post('register')
-  @ApiOperation({
-    summary: 'sms client register',
-  })
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  async register(
-    @ReqContext() ctx: RequestContext,
-    @Body() body: SMSClientRegisterInput,
-  ) {
-    await this.authService.register(body);
-  }
-
   @Post('refresh-token')
   @ApiOperation({
     summary: 'refressh access token',
