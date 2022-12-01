@@ -17,7 +17,7 @@ import {
   UserAccessTokenClaims,
 } from '../dtos/auth-token-output.dto';
 import { SSOService } from 'src/user/services/sso.service';
-import { WhatsappClientEntityInterface } from 'src/whatsapp/dtos/whatsapp-client-input.dto';
+
 import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
 
 @Injectable()
@@ -218,6 +218,10 @@ export class AuthService {
 
   async requestForgetPassword(email: string): Promise<void> {
     await this.sendForgetPasswordEmail(email);
+  }
+
+  public async checkAndProcessWAPublicToken(id: number) {
+    return true;
   }
 
   private async createRandomPassword(email: string): Promise<string> {

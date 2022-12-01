@@ -21,6 +21,18 @@ export class WhatsappPublicUsage {
   @Column()
   tokenId: number;
 
+  @Column({ type: 'text', nullable: true, default: null })
+  host: string;
+
+  @Column({ nullable: true, default: null })
+  ip: string;
+
+  @Column({ type: 'text', nullable: true, default: null })
+  referer: string;
+
+  @Column({ type: 'text', nullable: true, default: null })
+  userAgent: string;
+
   @CreateDateColumn({ name: 'createdAt', nullable: true })
   createdAt: Date;
 }

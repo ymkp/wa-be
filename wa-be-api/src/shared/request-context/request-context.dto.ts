@@ -9,6 +9,10 @@ export class RequestContext {
 
   public userAgent?: string;
 
+  public host?: string;
+
+  public referer?: string;
+
   // TODO : Discuss with team if this import is acceptable or if we should move UserAccessTokenClaims to shared.
   public user: UserAccessTokenClaims;
 }

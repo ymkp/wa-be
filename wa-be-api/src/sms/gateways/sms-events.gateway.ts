@@ -93,8 +93,8 @@ export class SMSEventsGateway {
   private async ping() {
     console.log('ping 30 secs');
     // TODO : ack socket
-    // this.server.emit('ping', 'ping', (res: any) => {
-    //   console.log('response ? ', res);
-    // });
+    this.server.emit('ping', 'ping', (res: any) => {
+      console.log('response ? ', res);
+    });
   }
 }

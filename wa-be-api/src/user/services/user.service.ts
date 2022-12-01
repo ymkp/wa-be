@@ -224,10 +224,16 @@ export class UserService {
 
   public async setWhatsappClient(input: MultipleIdsToSingleEntityInput) {
     const user = await this.repository.getById(input.entityId);
-    const clients = await this.waClientRepo.find({
-      where: { id: In(input.ids) },
-    });
-    user.permittedClients = clients;
+    console.log('input ? ', input);
+    if (!input.ids) {
+      user.permittedClients = [];
+    } else {
+      const clients = await this.waClientRepo.find({
+        where: { id: In(input.ids) },
+      });
+      user.permittedClients = clients;
+    }
+
     await this.repository.save(user);
   }
 
@@ -276,7 +282,7 @@ export class UserService {
     const token = await this.waPublicTokenRepo.findOne({
       where: { userId: user.id },
     });
-    if (!token) {
+    if (token) {
       await this.waPublicTokenRepo.softDelete(token.id);
     }
     await this.waPublicTokenRepo.save({

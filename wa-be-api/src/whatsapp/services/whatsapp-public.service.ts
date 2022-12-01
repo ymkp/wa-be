@@ -17,6 +17,8 @@ import {
 import { WhatsappMessage } from '../entities/whatsapp-message.entity';
 import { WhatsappClientRepository } from '../repositories/whatsapp-client.repository';
 import { WhatsappMessageRepository } from '../repositories/whatsapp-message.entity';
+import { WhatsappPublicTokenRepository } from '../repositories/whatsapp-public-token.repository';
+import { WhatsappPublicUsageRepository } from '../repositories/whatsapp-public-usage.repository';
 import { WhatsappCacheService } from './whatsapp-cache.service';
 import { WhatsappCLientService } from './whatsapp-client.service';
 import { WhatsappMessageService } from './whatsapp-message.service';
@@ -29,11 +31,14 @@ export class WhatsappPublicService {
     private readonly waCache: WhatsappCacheService,
     private readonly waMessageRepo: WhatsappMessageRepository,
     private readonly userRepo: UserRepository,
+    private readonly waPublicUsageRepo: WhatsappPublicUsageRepository,
+    private readonly waPublicTokenRepo: WhatsappPublicTokenRepository,
   ) {}
   public async sendTextMessage(
     ctx: RequestContext,
     body: CreateWhatsappMessageInput,
   ): Promise<WhatsappMessageOutputDTO> {
+    await this.validateTokenAndRecordUsage(ctx);
     body.clientId = await this.checkContext(ctx, body.clientId);
     try {
       return await this.waMessageService.addTextMessage(body, ctx.user.id);
@@ -47,6 +52,8 @@ export class WhatsappPublicService {
     paginationQ: PaginationParamsDto,
     filterQ: WhatsappMessageFilterInput,
   ): Promise<BaseApiResponse<WhatsappMessageOutputDTOMini[]>> {
+    await this.validateTokenAndRecordUsage(ctx);
+
     const options: FindManyOptions<WhatsappMessage> = {
       take: paginationQ.limit,
       skip: (paginationQ.page - 1) * paginationQ.limit,
@@ -92,6 +99,29 @@ export class WhatsappPublicService {
     };
     const data = plainToInstance(WhatsappMessageOutputDTOMini, res);
     return { data, meta };
+  }
+
+  public async validateTokenAndRecordUsage(
+    ctx: RequestContext,
+  ): Promise<boolean> {
+    const token = await this.waPublicTokenRepo.findOne({
+      where: {
+        userId: ctx.user.id,
+        secret: ctx.user.other as string,
+      },
+    });
+    if (token) {
+      await this.waPublicUsageRepo.save({
+        tokenId: token.id,
+        userAgent: ctx.userAgent,
+        referer: ctx.referer,
+        ip: ctx.ip,
+        host: ctx.host,
+      });
+      return true;
+    } else {
+      throw new BadRequestException('Token tidak valid atau sudah tidak aktif');
+    }
   }
 
   // ? -------------------privates
