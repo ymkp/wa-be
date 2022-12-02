@@ -13,10 +13,12 @@ import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
 import { EncryptService } from 'src/shared/signing/encrypt.service';
+import { SMS_DELIVERY_STATUS } from '../constants/sms-message-status.const';
 import {
   PhoneInfoGW,
   PhoneSocketRegisterInput,
 } from '../dtos/phone-socket.dto';
+import { SMSMessageRepository } from '../repositories/sms-message.repository';
 
 @Injectable()
 @WebSocketGateway({
@@ -26,7 +28,10 @@ import {
   },
 })
 export class SMSEventsGateway {
-  constructor(private readonly enc: EncryptService) {}
+  constructor(
+    private readonly enc: EncryptService,
+    private readonly smsMessageRepo: SMSMessageRepository,
+  ) {}
 
   clients: PhoneInfoGW[] = [];
 
@@ -90,6 +95,20 @@ export class SMSEventsGateway {
   identity(@MessageBody() data: number): WsResponse<any> {
     console.log('identity? ', data);
     return { event: 'identity', data: data };
+  }
+
+  @SubscribeMessage('sms-confirmation')
+  async smsConfirmation(@MessageBody() data: string): Promise<WsResponse<any>> {
+    console.log('confirmation to dec', data);
+    const msg = await this.enc.decryptString(data);
+    const ss = JSON.parse(msg) as { id: number; status: SMS_DELIVERY_STATUS };
+    this.smsMessageRepo.update(ss.id, {
+      status: ss.status,
+    });
+
+    console.log('confirmation to dec', msg);
+
+    return { event: 'confirmation', data: data };
   }
 
   broadcastMessage(message: string) {

@@ -83,9 +83,9 @@ export class AuthService {
     input.isAccountDisabled = false;
     if (!input.password) {
       input.password = await this.createRandomPassword(input.email);
+      this.sendSetPasswordEmail(input.email);
     }
     const registeredUser = await this.userService.createUser(ctx, input);
-    await this.sendSetPasswordEmail(input.email);
 
     return plainToInstance(RegisterOutput, registeredUser, {
       excludeExtraneousValues: true,

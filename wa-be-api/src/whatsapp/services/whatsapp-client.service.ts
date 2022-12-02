@@ -1,12 +1,12 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
 import {
-  WhatsappClientEntityInput,
-  WhatsappClientEntityInterface,
+  WhatsappClientChangeNameInput,
   WhatsappClientIdInput,
   WhatsappClientInputRegister,
   WhatsappClientQRGenerateInput,
@@ -201,6 +201,21 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
       serverPort: client.port,
     });
     return plainToInstance(WhatsappClientOutputDTO, client);
+  }
+
+  public async editWaClientName(
+    input: WhatsappClientChangeNameInput,
+  ): Promise<WhatsappClientOutputDTO> {
+    const c = await this.clientRepo.findOne({
+      where: { id: input.id },
+    });
+    if (c) {
+      c.name = input.name;
+      await this.clientRepo.save(c);
+      return plainToInstance(WhatsappClientOutputDTO, c);
+    } else {
+      throw new NotFoundException('Client tidak ditemukan');
+    }
   }
 
   public async loginWAWorkerPublic(body: WhatsappClientIdInput): Promise<void> {

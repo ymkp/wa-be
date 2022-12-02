@@ -23,6 +23,9 @@ export class SMSPublicUsage {
   @Column({ type: 'text', nullable: true, default: null })
   host: string;
 
+  @Column({ type: 'text', nullable: true, default: null })
+  url: string;
+
   @Column({ nullable: true, default: null })
   ip: string;
 

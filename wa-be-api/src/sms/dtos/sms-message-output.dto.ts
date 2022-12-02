@@ -46,15 +46,25 @@ export class SMSMessageMiniDTO {
   id: number;
 
   @Expose()
-  @Transform(({ value }) => value?.msisdn ?? null, { toClassOnly: true })
-  client: string;
-
-  @Expose()
-  @Transform(({ value }) => value?.msisdn ?? null, { toClassOnly: true })
-  contact: string;
+  status: string;
 
   @Expose()
   message: string;
+
+  @Expose()
+  @Transform(({ value }) => value?.msisdn ?? '', { toClassOnly: true })
+  contact: string;
+
+  @Expose()
+  @Type(() => SMSContactOutputDTO)
+  client: SMSContactOutputDTO;
+
+  @Expose()
+  @Type(() => UserOutputMini)
+  createdBy: UserOutputMini;
+
+  @Expose()
+  updatedAt: Date;
 
   @Expose()
   createdAt: Date;

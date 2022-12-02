@@ -12,7 +12,7 @@ import { SMSMessageMiniDTO } from '../dtos/sms-message-output.dto';
 import { SMSClientService } from '../services/sms-client.service';
 import { SMSMessageService } from '../services/sms-message.service';
 
-@ApiTags('sms-worker')
+@ApiTags('sms-worker : untuk worker, jangan dipakai untuk admin')
 @Controller('sms-worker')
 @UseGuards(JwtSMSAuthGuard)
 @ApiBearerAuth()

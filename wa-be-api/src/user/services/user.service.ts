@@ -10,6 +10,8 @@ import { RegisterInput } from 'src/auth/dtos/auth-register-input.dto';
 import { AuthTokenOutput } from 'src/auth/dtos/auth-token-output.dto';
 import { MultipleIdsToSingleEntityInput } from 'src/shared/dtos/id-value-input.dto';
 import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
+import { SMSClientRepository } from 'src/sms/repositories/sms-client.repository';
+import { SMSPublicTokenRepository } from 'src/sms/repositories/sms-public-token.repository';
 import { WhatsappClientRepository } from 'src/whatsapp/repositories/whatsapp-client.repository';
 import { WhatsappPublicTokenRepository } from 'src/whatsapp/repositories/whatsapp-public-token.repository';
 import { In } from 'typeorm';
@@ -37,6 +39,8 @@ export class UserService {
     private readonly signService: JwtSigningService,
     private readonly waClientRepo: WhatsappClientRepository,
     private readonly waPublicTokenRepo: WhatsappPublicTokenRepository,
+    private readonly smsClientRepo: SMSClientRepository,
+    private readonly smsPublicTokenRepo: SMSPublicTokenRepository,
   ) {}
 
   async countUser(): Promise<number> {
@@ -224,7 +228,6 @@ export class UserService {
 
   public async setWhatsappClient(input: MultipleIdsToSingleEntityInput) {
     const user = await this.repository.getById(input.entityId);
-    console.log('input ? ', input);
     if (!input.ids) {
       user.permittedClients = [];
     } else {
@@ -232,6 +235,20 @@ export class UserService {
         where: { id: In(input.ids) },
       });
       user.permittedClients = clients;
+    }
+
+    await this.repository.save(user);
+  }
+
+  public async setSMSClient(input: MultipleIdsToSingleEntityInput) {
+    const user = await this.repository.getById(input.entityId);
+    if (!input.ids) {
+      user.permittedSMSs = [];
+    } else {
+      const clients = await this.smsClientRepo.find({
+        where: { id: In(input.ids) },
+      });
+      user.permittedSMSs = clients;
     }
 
     await this.repository.save(user);
@@ -270,11 +287,7 @@ export class UserService {
         isSuperAdmin: true,
         permittedClients: { id: true },
       },
-      relations: {
-        permittedClients: true,
-      },
     });
-    const clientIds = user.permittedClients.map((c) => c.id);
     const secret = Array(32)
       .fill(null)
       .map(() => Math.round(Math.random() * 16).toString(16))
@@ -292,7 +305,38 @@ export class UserService {
     return this.generateTokenWorker({
       id: user.id,
       identificationNo: user.identificationNo,
-      clientIds,
+      isSuperAdmin: user.isSuperAdmin,
+      secret,
+    });
+  }
+
+  public async generateSMSTokenForUser(id: number): Promise<AuthTokenOutput> {
+    const user = await this.repository.findOneOrFail({
+      where: { id },
+      select: {
+        id: true,
+        identificationNo: true,
+        isSuperAdmin: true,
+        permittedClients: { id: true },
+      },
+    });
+    const secret = Array(32)
+      .fill(null)
+      .map(() => Math.round(Math.random() * 16).toString(16))
+      .join('');
+    const token = await this.smsPublicTokenRepo.findOne({
+      where: { userId: user.id },
+    });
+    if (token) {
+      await this.smsPublicTokenRepo.softDelete(token.id);
+    }
+    await this.smsPublicTokenRepo.save({
+      user,
+      secret,
+    });
+    return this.generateTokenWorker({
+      id: user.id,
+      identificationNo: user.identificationNo,
       isSuperAdmin: user.isSuperAdmin,
       secret,
     });
@@ -301,7 +345,6 @@ export class UserService {
   private generateTokenWorker(input: {
     id: number;
     identificationNo: string;
-    clientIds: number[];
     isSuperAdmin: boolean;
     secret: string;
   }): AuthTokenOutput {
@@ -310,7 +353,7 @@ export class UserService {
       username: input.identificationNo,
       sub: input.id,
       other: input.secret,
-      type: 'wa-user',
+      type: 'public-token',
       isSuperAdmin: input.isSuperAdmin,
     };
 

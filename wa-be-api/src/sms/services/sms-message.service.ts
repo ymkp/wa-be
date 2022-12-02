@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
@@ -45,6 +45,10 @@ export class SMSMessageService {
     input: SMSMessageCreateInputDTO,
   ): Promise<SMSMessageDetailDTO> {
     const contact = await this.contact.getOrCreateContact(input.to);
+    const availableIds = this.gw.getAvailableCLients();
+    if (!availableIds.includes(input.clientId)) {
+      throw new BadRequestException('Client tidak tersedia');
+    }
     const client = await this.client.getClient(input.clientId);
     const createdBy = await this.userRepo.getById(ctx.user.id);
     const sms = await this.messageRepo.save({
@@ -78,7 +82,7 @@ export class SMSMessageService {
       take: paginationQ.limit,
       skip: (paginationQ.page - 1) * paginationQ.limit,
       order: { id: 'DESC' },
-      relations: ['client', 'contact'],
+      relations: ['client', 'contact', 'createdBy'],
       select: {
         id: true,
         client: {
@@ -90,6 +94,11 @@ export class SMSMessageService {
         status: true,
         createdAt: true,
         updatedAt: true,
+        createdBy: {
+          id: true,
+          name: true,
+          identificationNo: true,
+        },
       },
     };
     const where: FindOptionsWhere<SMSMessage> = {};

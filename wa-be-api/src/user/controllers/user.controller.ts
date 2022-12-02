@@ -147,7 +147,7 @@ export class UserController {
     return { data: user, meta: {} };
   }
 
-  @Post('client-permission')
+  @Post('whatsapp-client-permission')
   @ApiOperation({
     summary: 'set whatsapp clients for user',
   })
@@ -156,6 +156,18 @@ export class UserController {
     @Body() body: MultipleIdsToSingleEntityInput,
   ): Promise<BaseApiResponse<string>> {
     await this.userService.setWhatsappClient(body);
+    return { data: 'ok' };
+  }
+
+  @Post('sms-client-permission')
+  @ApiOperation({
+    summary: 'set sms clients for user',
+  })
+  @UseGuards(SuperAdminGuard)
+  async setSMSClient(
+    @Body() body: MultipleIdsToSingleEntityInput,
+  ): Promise<BaseApiResponse<string>> {
+    await this.userService.setSMSClient(body);
     return { data: 'ok' };
   }
 
@@ -171,23 +183,43 @@ export class UserController {
     await this.userService.editPassword(ctx, input);
   }
 
-  @Get('token/generate-for-me')
-  @ApiOperation({ summary: 'generate user for logged in user' })
+  @Get('token/generate-whatsapp-for-me')
+  @ApiOperation({ summary: 'generate wa token for logged in user' })
   async generateWATokenForSelf(
     @ReqContext() ctx: RequestContext,
   ): Promise<AuthTokenOutput> {
     return await this.userService.generateWATokenForUser(ctx.user.id);
   }
 
-  @Get('token/generate-for-other/:userId')
+  @Get('token/generate-sms-for-me')
+  @ApiOperation({ summary: 'generate sms token for logged in user' })
+  async generateSMSTokenForSelf(
+    @ReqContext() ctx: RequestContext,
+  ): Promise<AuthTokenOutput> {
+    return await this.userService.generateSMSTokenForUser(ctx.user.id);
+  }
+
+  @Get('token/generate-whatsapp-for-other/:userId')
   @ApiOperation({
     summary:
-      'generate user token for other users. Only superadmin can do this operation',
+      'generate wa token for other user. Only superadmin can do this operation',
   })
   @UseGuards(SuperAdminGuard)
   async generateWATokenForOtherUser(
     @Param('userId') userId: number,
   ): Promise<AuthTokenOutput> {
     return await this.userService.generateWATokenForUser(userId);
+  }
+
+  @Get('token/generate-sms-for-other/:userId')
+  @ApiOperation({
+    summary:
+      'generate sms token for other user. Only superadmin can do this operation',
+  })
+  @UseGuards(SuperAdminGuard)
+  async generateSMSTokenForOtherUser(
+    @Param('userId') userId: number,
+  ): Promise<AuthTokenOutput> {
+    return await this.userService.generateSMSTokenForUser(userId);
   }
 }

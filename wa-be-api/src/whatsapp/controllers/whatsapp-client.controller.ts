@@ -16,7 +16,7 @@ import { SuperAdminGuard } from 'src/auth/guards/superadmin.guard';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import {
-  WhatsappClientEntityInput,
+  WhatsappClientChangeNameInput,
   WhatsappClientIdInput,
   WhatsappClientInputRegister,
   WhatsappClientQRGenerateInput,
@@ -51,10 +51,12 @@ export class WhatsappClientController {
     return await this.waClientService.createWAClient(body);
   }
 
-  @Patch('')
-  @ApiOperation({ summary: 'NOT-YET-IMPLEMENTED edit a WA client' })
-  async editAClient(@Body() body: WhatsappClientEntityInput) {
-    // TODO : implementation
+  @Patch('/change-name')
+  @ApiOperation({ summary: 'edit wa client name' })
+  async editAClient(
+    @Body() body: WhatsappClientChangeNameInput,
+  ): Promise<WhatsappClientOutputDTO> {
+    return await this.waClientService.editWaClientName(body);
   }
 
   @Post('worker/login')
@@ -102,17 +104,5 @@ export class WhatsappClientController {
     @Body() body: WhatsappClientQRGenerateInput,
   ): Promise<any> {
     return await this.waClientService.generateQRLogin(body);
-  }
-
-  @Post('/token/generate')
-  @ApiOperation({ summary: 'NOT-YET-IMPLEMENTED generate token for client' })
-  async tokenGenerate(@Body() body: WhatsappClientEntityInput) {
-    // TODO : implementation
-  }
-
-  @Post('/status')
-  @ApiOperation({ summary: 'NOT-YET-IMPLEMENTED check client status' })
-  async clientStatus(@Body() body: WhatsappClientEntityInput): Promise<any> {
-    return await this.waClientService.checkClientStatus(body.id);
   }
 }

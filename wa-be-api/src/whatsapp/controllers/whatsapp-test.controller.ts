@@ -7,21 +7,21 @@ import { RequestContext } from 'src/shared/request-context/request-context.dto';
 import { WhatsappTestMessageTextInput } from '../dtos/whatsapp-message-input.dto';
 import { WhatsappTestService } from '../services/whatsapp-test.service';
 
-@ApiTags('whatsapp-test')
+// @ApiTags('whatsapp-test')
+// @UseGuards(JwtAuthGuard, SuperAdminGuard)
+// @ApiBearerAuth()
 @Controller('whatsapp-test')
-@UseGuards(JwtAuthGuard, SuperAdminGuard)
-@ApiBearerAuth()
 export class WhatsappTestController {
   constructor(private readonly test: WhatsappTestService) {}
 
-  @Post('/send/text')
-  @ApiOperation({
-    summary: 'send a message with public token',
-  })
-  public sendMessage(
-    @ReqContext() ctx: RequestContext,
-    @Body() body: WhatsappTestMessageTextInput,
-  ) {
-    this.test.sendTextMessage(ctx, body);
-  }
+  // @Post('/send/text')
+  // @ApiOperation({
+  //   summary: 'send a message with public token',
+  // })
+  // public sendMessage(
+  //   @ReqContext() ctx: RequestContext,
+  //   @Body() body: WhatsappTestMessageTextInput,
+  // ) {
+  //   this.test.sendTextMessage(ctx, body);
+  // }
 }

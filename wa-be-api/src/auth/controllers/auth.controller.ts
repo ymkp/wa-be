@@ -42,7 +42,6 @@ import { AuthTokenOutput } from '../dtos/auth-token-output.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { JwtRefreshGuard } from '../guards/jwt-refresh.guard';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
-import { ModeratorGuard } from '../guards/moderator.guard';
 import { SuperAdminGuard } from '../guards/superadmin.guard';
 import { AuthService } from '../services/auth.service';
 
@@ -82,7 +81,7 @@ export class AuthController {
     status: HttpStatus.CREATED,
     type: SwaggerBaseApiResponse(RegisterOutput),
   })
-  @UseGuards(JwtAuthGuard, ModeratorGuard)
+  @UseGuards(JwtAuthGuard, SuperAdminGuard)
   @ApiBearerAuth()
   async registerLocal(
     @ReqContext() ctx: RequestContext,

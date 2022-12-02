@@ -8,15 +8,19 @@ import { UserRepository } from 'src/user/repositories/user.repository';
 import { SMSAuthController } from './controllers/sms-auth.controller';
 import { SMSClientController } from './controllers/sms-client.controller';
 import { SMSMessageController } from './controllers/sms-message.controller';
+import { SMSPublicController } from './controllers/sms-public.controller';
 import { SMSWorkerController } from './controllers/sms-worker.controller';
 import { SMSEventsGateway } from './gateways/sms-events.gateway';
 import { SMSClientRepository } from './repositories/sms-client.repository';
 import { SMSContactRepository } from './repositories/sms-contact.repository';
 import { SMSMessageRepository } from './repositories/sms-message.repository';
+import { SMSPublicTokenRepository } from './repositories/sms-public-token.repository';
+import { SMSPublicUsageRepository } from './repositories/sms-public-usage.repository';
 import { SMSAuthService } from './services/sms-auth.service';
 import { SMSClientService } from './services/sms-client.service';
 import { SMSContactService } from './services/sms-contact.service';
 import { SMSMessageService } from './services/sms-message.service';
+import { SMSPublicService } from './services/sms-public.service';
 
 @Module({
   imports: [
@@ -25,6 +29,8 @@ import { SMSMessageService } from './services/sms-message.service';
       SMSClientRepository,
       SMSContactRepository,
       SMSMessageRepository,
+      SMSPublicTokenRepository,
+      SMSPublicUsageRepository,
       UserRepository,
     ]),
   ],
@@ -37,12 +43,14 @@ import { SMSMessageService } from './services/sms-message.service';
     EncryptService,
     SMSMessageService,
     SMSContactService,
+    SMSPublicService,
   ],
   controllers: [
     SMSAuthController,
     SMSClientController,
     SMSMessageController,
     SMSWorkerController,
+    SMSPublicController,
   ],
 })
 export class SmsModule {}

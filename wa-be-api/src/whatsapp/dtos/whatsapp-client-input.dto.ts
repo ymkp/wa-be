@@ -47,6 +47,18 @@ export class WhatsappClientEntityInput {
   port: number;
 }
 
+export class WhatsappClientChangeNameInput {
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  id: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+}
+
 export class WhatsappClientIdInput {
   @ApiProperty()
   @IsNumber()

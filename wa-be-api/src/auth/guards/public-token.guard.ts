@@ -6,10 +6,10 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
-import { STRATEGY_WA_TOKEN } from '../constants/strategy.constant';
+import { STRATEGY_PUBLIC_TOKEN } from '../constants/strategy.constant';
 
 @Injectable()
-export class WATokenGuard extends AuthGuard(STRATEGY_WA_TOKEN) {
+export class PublicTokenGuard extends AuthGuard(STRATEGY_PUBLIC_TOKEN) {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {

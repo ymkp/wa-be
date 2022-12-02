@@ -10,6 +10,8 @@ import { SSOService } from './services/sso.service';
 import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
 import { WhatsappClientRepository } from 'src/whatsapp/repositories/whatsapp-client.repository';
 import { WhatsappPublicTokenRepository } from 'src/whatsapp/repositories/whatsapp-public-token.repository';
+import { SMSClientRepository } from 'src/sms/repositories/sms-client.repository';
+import { SMSPublicTokenRepository } from 'src/sms/repositories/sms-public-token.repository';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { WhatsappPublicTokenRepository } from 'src/whatsapp/repositories/whatsap
       SSOTokenRepository,
       WhatsappClientRepository,
       WhatsappPublicTokenRepository,
+      SMSClientRepository,
+      SMSPublicTokenRepository,
     ]),
   ],
   providers: [UserService, JwtAuthStrategy, SSOService, JwtSigningService],

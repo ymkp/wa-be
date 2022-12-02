@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -14,7 +15,10 @@ import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import { ReqContext } from 'src/shared/request-context/req-context.decorator';
 import { RequestContext } from 'src/shared/request-context/request-context.dto';
-import { SMSClientRegisterInput } from '../dtos/sms-client-input.dto';
+import {
+  SMSClientEditNameInput,
+  SMSClientRegisterInput,
+} from '../dtos/sms-client-input.dto';
 import {
   SMSClientOutputDetailDTO,
   SMSClientOutputDTO,
@@ -37,8 +41,21 @@ export class SMSClientController {
   async register(
     @ReqContext() ctx: RequestContext,
     @Body() body: SMSClientRegisterInput,
-  ) {
-    await this.service.createSMSClient(body);
+  ): Promise<SMSClientOutputDTO> {
+    return await this.service.createSMSClient(body);
+  }
+
+  @Patch('edit-name')
+  @ApiOperation({
+    summary: 'edit sms client name',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async editName(
+    @ReqContext() ctx: RequestContext,
+    @Body() body: SMSClientEditNameInput,
+  ): Promise<SMSClientOutputDTO> {
+    return await this.service.editSMSClient(body);
   }
 
   @Get('get-all')

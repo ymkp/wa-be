@@ -10,47 +10,45 @@ import {
 import { WhatsappConversationFilterInput } from '../dtos/whatsapp-conversation.input.dto';
 import { WhatsappConversationService } from '../services/whatsapp-conversation.service';
 
-@ApiTags('whatsapp-conversation')
+// @ApiTags('whatsapp-conversation')
+// @UseGuards(JwtAuthGuard)
 @Controller('whatsapp-conversation')
-@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class WhatsappCOnversationController {
   constructor(private readonly service: WhatsappConversationService) {}
 
-  // createMessage() {}
+  // @Get('/list')
+  // @ApiOperation({
+  //   summary: 'get conversation list',
+  // })
+  // public async getConversationList(
+  //   @Query() paginationQ: PaginationParamsDto,
+  //   @Query() filterQ: WhatsappConversationFilterInput,
+  // ): Promise<BaseApiResponse<WhatsappConversationOutputDTO[]>> {
+  //   return await this.service.getConversationList(paginationQ, filterQ);
+  // }
 
-  @Get('/list')
-  @ApiOperation({
-    summary: 'get conversation list',
-  })
-  public async getConversationList(
-    @Query() paginationQ: PaginationParamsDto,
-    @Query() filterQ: WhatsappConversationFilterInput,
-  ): Promise<BaseApiResponse<WhatsappConversationOutputDTO[]>> {
-    return await this.service.getConversationList(paginationQ, filterQ);
-  }
+  // @Get('/info/:conversationId')
+  // @ApiOperation({
+  //   summary: 'get conversation info',
+  // })
+  // public async getConversationInfo(
+  //   @Param('conversationId') conversationId: number,
+  // ): Promise<WhatsappConversationOutputDTO> {
+  //   return await this.service.getCOnversationInfoById(conversationId);
+  // }
 
-  @Get('/info/:conversationId')
-  @ApiOperation({
-    summary: 'get conversation info',
-  })
-  public async getConversationInfo(
-    @Param('conversationId') conversationId: number,
-  ): Promise<WhatsappConversationOutputDTO> {
-    return await this.service.getCOnversationInfoById(conversationId);
-  }
-
-  @Get('/messages/:conversationId')
-  @ApiOperation({
-    summary: 'get conversation messages',
-  })
-  public async getConversationMessages(
-    @Param('conversationId') conversationId: number,
-    @Query() paginationQ: PaginationParamsDto,
-  ): Promise<BaseApiResponse<WhatsappConversationMessageOutputDTO[]>> {
-    return await this.service.getConversationMessagesByConversationId(
-      conversationId,
-      paginationQ,
-    );
-  }
+  // @Get('/messages/:conversationId')
+  // @ApiOperation({
+  //   summary: 'get conversation messages',
+  // })
+  // public async getConversationMessages(
+  //   @Param('conversationId') conversationId: number,
+  //   @Query() paginationQ: PaginationParamsDto,
+  // ): Promise<BaseApiResponse<WhatsappConversationMessageOutputDTO[]>> {
+  //   return await this.service.getConversationMessagesByConversationId(
+  //     conversationId,
+  //     paginationQ,
+  //   );
+  // }
 }

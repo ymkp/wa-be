@@ -29,6 +29,7 @@ export class EncryptService {
   }
 
   public async decryptString(message: string): Promise<string> {
+    console.log('msg to dct : ', message);
     const encText = Buffer.from(message, 'hex');
     const iv = Buffer.from(this.ivString, 'hex');
     const key = (await promisify(scrypt)(this.password, 'salt', 32)) as Buffer;

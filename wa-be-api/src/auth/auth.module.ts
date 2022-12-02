@@ -13,7 +13,7 @@ import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { JWTSMSAuthStrategy } from './strategies/jwt-sms-auth.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
-import { WAClientTokenStrategy } from './strategies/wa-token.strategy';
+import { PublicClientTokenStrategy } from './strategies/public-token.strategy';
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { WAClientTokenStrategy } from './strategies/wa-token.strategy';
     JwtAuthStrategy,
     JwtRefreshStrategy,
     JWTSMSAuthStrategy,
-    WAClientTokenStrategy,
+    PublicClientTokenStrategy,
     JwtSigningService,
   ],
 })

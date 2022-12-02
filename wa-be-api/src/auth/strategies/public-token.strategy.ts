@@ -3,13 +3,13 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { STRATEGY_WA_TOKEN } from '../constants/strategy.constant';
+import { STRATEGY_PUBLIC_TOKEN } from '../constants/strategy.constant';
 import { UserAccessTokenClaims } from '../dtos/auth-token-output.dto';
 
 @Injectable()
-export class WAClientTokenStrategy extends PassportStrategy(
+export class PublicClientTokenStrategy extends PassportStrategy(
   Strategy,
-  STRATEGY_WA_TOKEN,
+  STRATEGY_PUBLIC_TOKEN,
 ) {
   constructor(private readonly configService: ConfigService) {
     super({

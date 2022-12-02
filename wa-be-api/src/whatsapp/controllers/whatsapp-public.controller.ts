@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { WATokenGuard } from 'src/auth/guards/wa-token.guard';
+import { PublicTokenGuard } from 'src/auth/guards/public-token.guard';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
 import { ReqContext } from 'src/shared/request-context/req-context.decorator';
@@ -15,9 +15,9 @@ import {
 } from '../dtos/whatsapp-message-output.dto';
 import { WhatsappPublicService } from '../services/whatsapp-public.service';
 
-@ApiTags('whatsapp-public')
+@ApiTags('whatsapp-public, dipakai oleh orang luar')
 @Controller('whatsapp-public')
-@UseGuards(WATokenGuard)
+@UseGuards(PublicTokenGuard)
 @ApiBearerAuth()
 export class WhatsappPublicController {
   constructor(private readonly waPublicService: WhatsappPublicService) {}

@@ -1,12 +1,22 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { UserService } from 'src/user/services/user.service';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 
-// FIXME : fix this like eberkas!
 @Injectable()
 export class SuperAdminGuard implements CanActivate {
-  constructor(private readonly userService: UserService) {}
+  constructor() {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const { user } = context.switchToHttp().getRequest();
-    return await this.userService.checkIsSuperAdmin(user.id);
+
+    if (user.isSuperAdmin) {
+      return true;
+    }
+
+    throw new UnauthorizedException(
+      `Only user with moderator access have access to this route`,
+    );
   }
 }

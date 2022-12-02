@@ -6,7 +6,7 @@ import {
 } from '../dtos/whatsapp-hook-input.dto';
 import { WhatsappHookService } from '../services/whatsapp-hook.service';
 
-@ApiTags('whatsapp-hook')
+@ApiTags('whatsapp-hook, dipakai worker, jangan dipakai admin')
 @Controller('whatsapp-hook')
 // TODO : implement jwt
 export class WhatsappHookController {

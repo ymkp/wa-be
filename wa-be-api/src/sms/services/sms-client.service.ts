@@ -12,7 +12,10 @@ import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
 import { RequestContext } from 'src/shared/request-context/request-context.dto';
 import { FindManyOptions, In } from 'typeorm';
 import { SMS_CLIENT_STATUS } from '../constants/sms-client-status.const';
-import { SMSClientRegisterInput } from '../dtos/sms-client-input.dto';
+import {
+  SMSClientEditNameInput,
+  SMSClientRegisterInput,
+} from '../dtos/sms-client-input.dto';
 import {
   SMSClientOutputDetailDTO,
   SMSClientOutputDTO,
@@ -45,10 +48,22 @@ export class SMSClientService {
     return plainToInstance(SMSClientOutputDTO, client);
   }
 
-  async createSMSClient(input: SMSClientRegisterInput) {
+  async createSMSClient(
+    input: SMSClientRegisterInput,
+  ): Promise<SMSClientOutputDTO> {
     const client = plainToInstance(SMSClient, input);
     client.password = await hash(input.password, 10);
     await this.clientRepo.save(client);
+    return plainToInstance(SMSClientOutputDTO, client);
+  }
+
+  async editSMSClient(
+    input: SMSClientEditNameInput,
+  ): Promise<SMSClientOutputDTO> {
+    const c = await this.clientRepo.getById(input.id);
+    c.name = input.name;
+    await this.clientRepo.save(c);
+    return plainToInstance(SMSClientOutputDTO, c);
   }
 
   async getMe(ctx: RequestContext): Promise<SMSClientOutputDTO> {
@@ -77,7 +92,9 @@ export class SMSClientService {
       }
     } else {
       const tmpId =
-        this.availablePhoneIDS[Math.random() * this.availablePhoneIDS.length];
+        this.availablePhoneIDS[
+          Math.floor(Math.random() * this.availablePhoneIDS.length)
+        ];
       client = await this.clientRepo.getById(tmpId);
     }
     return client;
@@ -124,8 +141,10 @@ export class SMSClientService {
         clients.forEach((c) => {
           if (ids.includes(c.id)) {
             c.status = SMS_CLIENT_STATUS.ONLINE;
+            c.isActive = true;
           } else {
             c.status = SMS_CLIENT_STATUS.OFFLINE;
+            c.isActive = false;
           }
         });
         await this.clientRepo.save(clients);

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
@@ -15,7 +19,6 @@ import {
   WhatsappMessageOutputDTOMini,
 } from '../dtos/whatsapp-message-output.dto';
 import { WhatsappMessage } from '../entities/whatsapp-message.entity';
-import { WhatsappClientRepository } from '../repositories/whatsapp-client.repository';
 import { WhatsappMessageRepository } from '../repositories/whatsapp-message.entity';
 import { WhatsappPublicTokenRepository } from '../repositories/whatsapp-public-token.repository';
 import { WhatsappPublicUsageRepository } from '../repositories/whatsapp-public-usage.repository';
@@ -26,7 +29,6 @@ import { WhatsappMessageService } from './whatsapp-message.service';
 @Injectable()
 export class WhatsappPublicService {
   constructor(
-    private readonly waClientService: WhatsappCLientService,
     private readonly waMessageService: WhatsappMessageService,
     private readonly waCache: WhatsappCacheService,
     private readonly waMessageRepo: WhatsappMessageRepository,
@@ -43,11 +45,7 @@ export class WhatsappPublicService {
       ctx,
       body.clientId,
     );
-    try {
-      return await this.waMessageService.addTextMessage(body, ctx.user.id);
-    } catch (err) {
-      console.log('send text message public failed : ', err);
-    }
+    return await this.waMessageService.addTextMessage(body, ctx.user.id);
   }
 
   public async getTextMessage(
@@ -66,6 +64,11 @@ export class WhatsappPublicService {
       select: {
         id: true,
         client: {
+          id: true,
+          name: true,
+          msisdn: true,
+        },
+        contact: {
           id: true,
           name: true,
           msisdn: true,
@@ -120,6 +123,7 @@ export class WhatsappPublicService {
         referer: ctx.referer,
         ip: ctx.ip,
         host: ctx.host,
+        url: ctx.url,
       });
       return true;
     } else {
@@ -133,7 +137,24 @@ export class WhatsappPublicService {
     clientId?: number,
   ): Promise<number> {
     let clientIds: number[] = [];
-    if (!ctx.user.isSuperAdmin) {
+    const cs = await this.waCache.getClients();
+
+    if (ctx.user.isSuperAdmin) {
+      if (clientId) {
+        if (cs.includes(clientId)) {
+          return clientId;
+        } else {
+          throw new BadRequestException(
+            `Client ${clientId} sedang tidak aktif`,
+          );
+        }
+      } else {
+        console.log('client di cache : ', cs);
+        const csss = cs[Math.floor(Math.random() * cs.length)];
+        console.log('client random : ', csss);
+        return csss;
+      }
+    } else {
       const user = await this.userRepo.findOne({
         where: { id: ctx.user.id },
         select: {
@@ -144,30 +165,20 @@ export class WhatsappPublicService {
         loadEagerRelations: false,
       });
       clientIds = user.permittedClients.map((p) => p.id);
-    }
-    if (ctx.user.other && !ctx.user.isSuperAdmin) {
-      throw new BadRequestException(
-        'Anda tidak memiliki permission untuk client',
-      );
-    }
-    if (!clientId) {
-      console.log('tidak ada client id');
-      if (ctx.user.isSuperAdmin) {
-        const cs = await this.waCache.getClients();
-        console.log('client di cache : ', cs);
-        const csss = cs[Math.floor(Math.random() * cs.length)];
-        console.log('client random : ', csss);
-        return csss;
-      } else {
-        return clientIds[Math.floor(Math.random() * ctx.user.other.length)];
-      }
-    } else {
-      if (!clientIds.includes(clientId)) {
-        throw new BadRequestException(
-          'Anda tidak memiliki permission untuk client',
-        );
-      } else {
+      if (clientId) {
+        if (!clientIds.includes(clientId))
+          throw new UnauthorizedException(
+            `client dengan id : ${clientId} tidak boleh dipakai`,
+          );
         return clientId;
+      } else {
+        let availableIds: number[] = [];
+        cs.forEach((i) => {
+          if (clientIds.includes(i)) availableIds.push(i);
+        });
+        const csss =
+          availableIds[Math.floor(Math.random() * availableIds.length)];
+        return csss;
       }
     }
   }

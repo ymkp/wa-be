@@ -5,7 +5,6 @@ import { SharedModule } from 'src/shared/shared.module';
 import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
 import { TypeOrmExModule } from 'src/shared/typeorm-ex.module';
 import { UserRepository } from 'src/user/repositories/user.repository';
-import { UserService } from 'src/user/services/user.service';
 import { WhatsappClientController } from './controllers/whatsapp-client.controller';
 import { WhatsappContactController } from './controllers/whatsapp-contact.controller';
 import { WhatsappCOnversationController } from './controllers/whatsapp-conversation.controller';
@@ -60,7 +59,6 @@ import { WhatsappContactService } from './services/whtasapp-contact.service';
     WHatsappSchedulerService,
     WhatsappWorkerService,
     WhatsappTestService,
-    UserService,
     JwtSigningService,
     WhatsappHookService,
     WhatsappConversationService,
