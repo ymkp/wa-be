@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
@@ -31,6 +41,17 @@ export class SMSMessageController {
     @Body() body: SMSMessageCreateInputDTO,
   ): Promise<SMSMessageDetailDTO> {
     return await this.service.sendMessage(ctx, body);
+  }
+
+  @Patch('retry-sms/:id')
+  @ApiOperation({
+    summary: 'send sms message',
+  })
+  public async retrySMS(
+    @ReqContext() ctx: RequestContext,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<SMSMessageDetailDTO> {
+    return await this.service.retryMessage(id);
   }
 
   @Get('sms')

@@ -9,7 +9,7 @@ export class TokenOnlyUserDTO {
 }
 
 @Exclude()
-export class WhatsappPublicUsageOutputDTO {
+export class SMSPublicUsageOutputDTO {
   @Expose()
   id: number;
 

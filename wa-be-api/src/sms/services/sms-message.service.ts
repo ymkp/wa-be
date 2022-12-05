@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
@@ -66,6 +70,37 @@ export class SMSMessageService {
     const enc = await this.enc.encryptString(JSON.stringify(toSend));
     this.gw.broadcastMessage(enc);
     return plainToInstance(SMSMessageDetailDTO, sms);
+  }
+
+  public async retryMessage(
+    id: number,
+    sms?: SMSMessage,
+  ): Promise<SMSMessageDetailDTO> {
+    let message: SMSMessage;
+    if (sms) {
+      message = sms;
+    } else {
+      message = await this.messageRepo.findOne({
+        where: {
+          id,
+          status: SMS_DELIVERY_STATUS.ONQUEUE,
+        },
+        relations: ['client', 'contact'],
+      });
+      if (!message) throw new NotFoundException('Pesan tidak ditemukan');
+    }
+
+    message.status = SMS_DELIVERY_STATUS.RETRYING;
+    await this.messageRepo.save(message);
+    const toSend: SMSMessageToClientDTO = {
+      id: message.id,
+      message: message.message,
+      msisdn: message.client.msisdn,
+      to: message.contact.msisdn,
+    };
+    const enc = await this.enc.encryptString(JSON.stringify(toSend));
+    this.gw.broadcastMessage(enc);
+    return plainToInstance(SMSMessageDetailDTO, message);
   }
 
   public async updateMessageStatus(id: number, status: SMS_DELIVERY_STATUS) {

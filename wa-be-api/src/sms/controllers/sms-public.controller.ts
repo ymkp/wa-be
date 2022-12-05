@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PublicTokenGuard } from 'src/auth/guards/public-token.guard';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
@@ -44,5 +54,16 @@ export class SMSPublicController {
     @Query() filterQ: SMSMessageFilterQ,
   ): Promise<BaseApiResponse<SMSMessageMiniDTO[]>> {
     return await this.smsPublicService.getSMSs(ctx, paginationQ, filterQ);
+  }
+
+  @Patch('retry-sms/:id')
+  @ApiOperation({
+    summary: 'send sms message',
+  })
+  public async retrySMS(
+    @ReqContext() ctx: RequestContext,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<SMSMessageDetailDTO> {
+    return await this.smsPublicService.retrySMS(ctx, id);
   }
 }

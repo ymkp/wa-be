@@ -1,27 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { WhatsappPublicUsageRepository } from '../repositories/whatsapp-public-usage.repository';
-import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
-import {
-  WHatsappPublicUsageFilterQ,
-  WhatsappPublicUsageGetterQ,
-} from '../dtos/whatsapp-public-usage.input.dto';
-import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
-import { WhatsappPublicUsageOutputDTO } from '../dtos/whatsapp-public-usage-output.dto';
-import { Between, FindManyOptions, FindOptionsWhere } from 'typeorm';
-import { WhatsappPublicUsage } from '../entities/whatsapp-public-usage.entity';
-import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
+import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
+import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
+import { Between, FindManyOptions, FindOptionsWhere } from 'typeorm';
+import {
+  SMSPublicUsageFilterQ,
+  SMSPublicUsageGetterQ,
+} from '../dtos/sms-public-usage-input.dto';
+import { SMSPublicUsageOutputDTO } from '../dtos/sms-public-usage-output.dto';
+import { SMSPublicUsage } from '../entities/sms-public-usage.entity';
+import { SMSPublicUsageRepository } from '../repositories/sms-public-usage.repository';
 
 @Injectable()
-export class WhatsappPublicUsageService {
-  constructor(private readonly usageRepo: WhatsappPublicUsageRepository) {}
+export class SMSPublicUsageService {
+  constructor(private readonly usageRepo: SMSPublicUsageRepository) {}
 
   public async getUsages(
     paginationQ: PaginationParamsDto,
-    filterQ: WHatsappPublicUsageFilterQ,
-    getterQ: WhatsappPublicUsageGetterQ,
-  ): Promise<BaseApiResponse<WhatsappPublicUsageOutputDTO[]>> {
-    const options: FindManyOptions<WhatsappPublicUsage> = {
+    filterQ: SMSPublicUsageFilterQ,
+    getterQ: SMSPublicUsageGetterQ,
+  ): Promise<BaseApiResponse<SMSPublicUsageOutputDTO[]>> {
+    const options: FindManyOptions<SMSPublicUsage> = {
       take: paginationQ.limit,
 
       skip: (paginationQ.page - 1) * paginationQ.limit,
@@ -38,7 +38,7 @@ export class WhatsappPublicUsageService {
         userAgent: getterQ.isUserAgent,
       },
     };
-    const where: FindOptionsWhere<WhatsappPublicUsage> = {};
+    const where: FindOptionsWhere<SMSPublicUsage> = {};
     if (filterQ.userId) where.token = { userId: filterQ.userId };
     if (filterQ.lastDate || filterQ.startDate) {
       const lastDate = filterQ.lastDate
@@ -56,7 +56,7 @@ export class WhatsappPublicUsageService {
       page: paginationQ.page,
       maxPage: Math.ceil(count / paginationQ.limit),
     };
-    const data = plainToInstance(WhatsappPublicUsageOutputDTO, res);
+    const data = plainToInstance(SMSPublicUsageOutputDTO, res);
     return { data, meta };
   }
 }

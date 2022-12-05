@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
@@ -10,11 +11,15 @@ import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
 import { RequestContext } from 'src/shared/request-context/request-context.dto';
 import { UserRepository } from 'src/user/repositories/user.repository';
 import { FindManyOptions, FindOptionsWhere } from 'typeorm';
+import { SMS_DELIVERY_STATUS } from '../constants/sms-message-status.const';
 import {
   SMSMessageCreateInputDTO,
   SMSMessageFilterQ,
 } from '../dtos/sms-message-input.dto';
-import { SMSMessageMiniDTO } from '../dtos/sms-message-output.dto';
+import {
+  SMSMessageDetailDTO,
+  SMSMessageMiniDTO,
+} from '../dtos/sms-message-output.dto';
 import { SMSMessage } from '../entities/sms-message.entity';
 import { SMSEventsGateway } from '../gateways/sms-events.gateway';
 import { SMSMessageRepository } from '../repositories/sms-message.repository';
@@ -41,6 +46,22 @@ export class SMSPublicService {
       body.clientId,
     );
     return await this.smsMessageService.sendMessage(ctx, body);
+  }
+
+  public async retrySMS(
+    ctx: RequestContext,
+    id: number,
+  ): Promise<SMSMessageDetailDTO> {
+    const message = await this.smsMessageRepo.findOne({
+      where: {
+        id,
+        status: SMS_DELIVERY_STATUS.ONQUEUE,
+        createdById: ctx.user.id,
+      },
+      select: ['client', 'contact'],
+    });
+    if (!message) throw new NotFoundException('Pesan tidak ditemukan');
+    return await this.smsMessageService.retryMessage(id, message);
   }
 
   public async getSMSs(

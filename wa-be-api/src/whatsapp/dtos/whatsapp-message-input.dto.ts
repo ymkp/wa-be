@@ -39,7 +39,10 @@ export class WhatsappMessageFilterInput {
   @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
   createdById: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: WHATSAPP_MESSAGE_QUEUE_STATUS,
+    example: WHATSAPP_MESSAGE_QUEUE_STATUS.ONQUEUE,
+  })
   @IsEnum(WHATSAPP_MESSAGE_QUEUE_STATUS)
   @IsOptional()
   status: WHATSAPP_MESSAGE_QUEUE_STATUS;

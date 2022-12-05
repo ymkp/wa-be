@@ -45,7 +45,10 @@ export class SMSMessageFilterQ {
   @IsOptional()
   createdById: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: SMS_DELIVERY_STATUS,
+    example: SMS_DELIVERY_STATUS.ONQUEUE,
+  })
   @IsEnum(SMS_DELIVERY_STATUS)
   @IsOptional()
   status: SMS_DELIVERY_STATUS;
