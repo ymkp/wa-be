@@ -10,6 +10,7 @@ import { WhatsappContactController } from './controllers/whatsapp-contact.contro
 import { WhatsappCOnversationController } from './controllers/whatsapp-conversation.controller';
 import { WhatsappHookController } from './controllers/whatsapp-hook.controller';
 import { WhatsappMessageController } from './controllers/whatsapp-message.controller';
+import { WhatsappPublicUsageController } from './controllers/whatsapp-public-usage.controller';
 import { WhatsappPublicController } from './controllers/whatsapp-public.controller';
 import { WhatsappTestController } from './controllers/whatsapp-test.controller';
 import { WhatsappClientRepository } from './repositories/whatsapp-client.repository';
@@ -26,6 +27,7 @@ import { WhatsappCLientService } from './services/whatsapp-client.service';
 import { WhatsappConversationService } from './services/whatsapp-conversation.service';
 import { WhatsappHookService } from './services/whatsapp-hook.service';
 import { WhatsappMessageService } from './services/whatsapp-message.service';
+import { WhatsappPublicUsageService } from './services/whatsapp-public-usage.service';
 import { WhatsappPublicService } from './services/whatsapp-public.service';
 import { WHatsappSchedulerService } from './services/whatsapp-scheduler.service';
 import { WhatsappTestService } from './services/whatsapp-test.service';
@@ -62,6 +64,7 @@ import { WhatsappContactService } from './services/whtasapp-contact.service';
     JwtSigningService,
     WhatsappHookService,
     WhatsappConversationService,
+    WhatsappPublicUsageService,
   ],
   controllers: [
     WhatsappClientController,
@@ -71,6 +74,7 @@ import { WhatsappContactService } from './services/whtasapp-contact.service';
     WhatsappTestController,
     WhatsappHookController,
     WhatsappCOnversationController,
+    WhatsappPublicUsageController,
   ],
 })
 export class WhatsappModule {}

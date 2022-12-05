@@ -14,7 +14,7 @@ import { SMSPublicUsageService } from '../services/sms-public-usage.service';
 @Controller('whatsapp-public-usage')
 @UseGuards(JwtAuthGuard, SuperAdminGuard)
 @ApiBearerAuth()
-export class WhatsappPublicUsageController {
+export class SMSPublicUsageController {
   constructor(private readonly service: SMSPublicUsageService) {}
 
   @Get('')

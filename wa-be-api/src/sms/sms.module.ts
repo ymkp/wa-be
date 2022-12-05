@@ -8,6 +8,7 @@ import { UserRepository } from 'src/user/repositories/user.repository';
 import { SMSAuthController } from './controllers/sms-auth.controller';
 import { SMSClientController } from './controllers/sms-client.controller';
 import { SMSMessageController } from './controllers/sms-message.controller';
+import { SMSPublicUsageController } from './controllers/sms-public-usage.controller';
 import { SMSPublicController } from './controllers/sms-public.controller';
 import { SMSWorkerController } from './controllers/sms-worker.controller';
 import { SMSEventsGateway } from './gateways/sms-events.gateway';
@@ -20,6 +21,7 @@ import { SMSAuthService } from './services/sms-auth.service';
 import { SMSClientService } from './services/sms-client.service';
 import { SMSContactService } from './services/sms-contact.service';
 import { SMSMessageService } from './services/sms-message.service';
+import { SMSPublicUsageService } from './services/sms-public-usage.service';
 import { SMSPublicService } from './services/sms-public.service';
 
 @Module({
@@ -44,6 +46,7 @@ import { SMSPublicService } from './services/sms-public.service';
     SMSMessageService,
     SMSContactService,
     SMSPublicService,
+    SMSPublicUsageService,
   ],
   controllers: [
     SMSAuthController,
@@ -51,6 +54,7 @@ import { SMSPublicService } from './services/sms-public.service';
     SMSMessageController,
     SMSWorkerController,
     SMSPublicController,
+    SMSPublicUsageController,
   ],
 })
 export class SmsModule {}
