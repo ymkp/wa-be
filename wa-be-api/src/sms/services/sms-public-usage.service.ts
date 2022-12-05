@@ -36,6 +36,16 @@ export class SMSPublicUsageService {
         ip: getterQ.isIP,
         referer: getterQ.isReferer,
         userAgent: getterQ.isUserAgent,
+        token: getterQ.isUser
+          ? {
+              id: true,
+              user: {
+                id: true,
+                identificationNo: true,
+                name: true,
+              },
+            }
+          : {},
       },
     };
     const where: FindOptionsWhere<SMSPublicUsage> = {};

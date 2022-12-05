@@ -24,30 +24,36 @@ export class SMSPublicUsageGetterQ {
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
+  @Transform(({ value }) => value === 'true', { toClassOnly: true })
   isUser: boolean = true;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
+  @Transform(({ value }) => value === 'true', { toClassOnly: true })
   isHost: boolean = true;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
+  @Transform(({ value }) => value === 'true', { toClassOnly: true })
   isURL: boolean = true;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
+  @Transform(({ value }) => value === 'true', { toClassOnly: true })
   isIP: boolean = true;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
+  @Transform(({ value }) => value === 'true', { toClassOnly: true })
   isReferer: boolean = true;
 
   @ApiPropertyOptional()
   @IsBoolean()
   @IsOptional()
+  @Transform(({ value }) => value === 'true', { toClassOnly: true })
   isUserAgent: boolean = true;
 }

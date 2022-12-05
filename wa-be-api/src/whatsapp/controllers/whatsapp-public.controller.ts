@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PublicTokenGuard } from 'src/auth/guards/public-token.guard';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
@@ -31,6 +41,17 @@ export class WhatsappPublicController {
     @Body() body: CreateWhatsappMessageInput,
   ): Promise<WhatsappMessageOutputDTO> {
     return await this.waPublicService.sendTextMessage(ctx, body);
+  }
+
+  @Patch('/retry/:id')
+  @ApiOperation({
+    summary: 'send a message with public token',
+  })
+  public async retryMessage(
+    @ReqContext() ctx: RequestContext,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<WhatsappMessageOutputDTO> {
+    return await this.waPublicService.retryMessage(ctx, id);
   }
 
   @Get('/get/messages')

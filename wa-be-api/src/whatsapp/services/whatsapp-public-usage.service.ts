@@ -23,7 +23,6 @@ export class WhatsappPublicUsageService {
   ): Promise<BaseApiResponse<WhatsappPublicUsageOutputDTO[]>> {
     const options: FindManyOptions<WhatsappPublicUsage> = {
       take: paginationQ.limit,
-
       skip: (paginationQ.page - 1) * paginationQ.limit,
       order: { id: 'DESC' },
       relations: ['token', 'token.user'],
@@ -36,6 +35,16 @@ export class WhatsappPublicUsageService {
         ip: getterQ.isIP,
         referer: getterQ.isReferer,
         userAgent: getterQ.isUserAgent,
+        token: getterQ.isUser
+          ? {
+              id: true,
+              user: {
+                id: true,
+                identificationNo: true,
+                name: true,
+              },
+            }
+          : {},
       },
     };
     const where: FindOptionsWhere<WhatsappPublicUsage> = {};

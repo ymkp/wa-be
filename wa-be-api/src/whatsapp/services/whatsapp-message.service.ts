@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { BaseApiResponse } from 'src/shared/dtos/base-api-response.dto';
 import { PaginationParamsDto } from 'src/shared/dtos/pagination-params.dto';
@@ -6,6 +10,8 @@ import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
 import { RequestContext } from 'src/shared/request-context/request-context.dto';
 import { FindManyOptions, FindOptionsWhere } from 'typeorm';
 import { WHATSAPP_MESSAGE_CONTENT_TYPE } from '../constants/whatsapp-message-content-type.constant';
+import { WHATSAPP_MESSAGE_QUEUE_STATUS } from '../constants/whatsapp-message-queue-status.constant';
+import { WhatsappClientOutputDTO } from '../dtos/whatsapp-client-output.dto';
 import {
   CreateWhatsappMessageInput,
   WhatsappMessageFilterInput,
@@ -60,6 +66,27 @@ export class WhatsappMessageService {
     });
     this.schedulerService.addQueue(m);
     return plainToInstance(WhatsappMessageOutputDTO, m);
+  }
+
+  public async retryMessage(
+    id: number,
+    waMessage?: WhatsappMessage,
+  ): Promise<WhatsappMessageOutputDTO> {
+    let message: WhatsappMessage;
+    if (waMessage) {
+      message = waMessage;
+    } else {
+      message = await this.messageRepo.findOne({
+        where: { id, status: WHATSAPP_MESSAGE_QUEUE_STATUS.FAILED },
+        relations: ['client', 'contact', 'content'],
+        loadEagerRelations: false,
+      });
+      if (!message) throw new NotFoundException('Pesan tidak ditemukan');
+    }
+    message.status = WHATSAPP_MESSAGE_QUEUE_STATUS.RETRYING;
+    await this.messageRepo.save(message);
+    this.schedulerService.addQueue(message);
+    return plainToInstance(WhatsappMessageOutputDTO, message);
   }
 
   public async getMessageWithPagination(

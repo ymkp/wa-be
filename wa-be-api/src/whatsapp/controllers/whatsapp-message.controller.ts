@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -56,6 +58,17 @@ export class WhatsappMessageController {
     @Body() body: CreateWhatsappMessageInput,
   ): Promise<WhatsappMessageOutputDTO> {
     return await this.service.addTextMessage(body, ctx.user.id);
+  }
+
+  @Patch('/retry/:id')
+  @ApiOperation({
+    summary:
+      'retry a message. Only message with status :  FAILED can be retried',
+  })
+  async retryMessage(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<WhatsappMessageOutputDTO> {
+    return await this.service.retryMessage(id);
   }
 
   @Get('/onqueue')

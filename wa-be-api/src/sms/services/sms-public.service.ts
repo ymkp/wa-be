@@ -52,6 +52,7 @@ export class SMSPublicService {
     ctx: RequestContext,
     id: number,
   ): Promise<SMSMessageDetailDTO> {
+    await this.validateTokenAndRecordUsage(ctx);
     const message = await this.smsMessageRepo.findOne({
       where: {
         id,

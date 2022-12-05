@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
@@ -10,6 +11,7 @@ import { PaginationResponseDto } from 'src/shared/dtos/pagination-response.dto';
 import { RequestContext } from 'src/shared/request-context/request-context.dto';
 import { UserRepository } from 'src/user/repositories/user.repository';
 import { FindManyOptions, FindOptionsWhere } from 'typeorm';
+import { WHATSAPP_MESSAGE_QUEUE_STATUS } from '../constants/whatsapp-message-queue-status.constant';
 import {
   CreateWhatsappMessageInput,
   WhatsappMessageFilterInput,
@@ -46,6 +48,24 @@ export class WhatsappPublicService {
       body.clientId,
     );
     return await this.waMessageService.addTextMessage(body, ctx.user.id);
+  }
+
+  public async retryMessage(
+    ctx: RequestContext,
+    id: number,
+  ): Promise<WhatsappMessageOutputDTO> {
+    await this.validateTokenAndRecordUsage(ctx);
+    const message = await this.waMessageRepo.findOne({
+      where: {
+        createdById: ctx.user.id,
+        id,
+        status: WHATSAPP_MESSAGE_QUEUE_STATUS.FAILED,
+      },
+      relations: ['client', 'contact', 'content'],
+      loadEagerRelations: false,
+    });
+    if (!message) throw new NotFoundException('Pesan tidak ditemukan');
+    return await this.waMessageService.retryMessage(id, message);
   }
 
   public async getTextMessage(
