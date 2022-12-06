@@ -14,7 +14,7 @@ import { SmsModule } from './sms/sms.module';
     UserModule,
     CacheModule.register(),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, '..', 'uploads'),
     }),
     WhatsappModule,
     SmsModule,

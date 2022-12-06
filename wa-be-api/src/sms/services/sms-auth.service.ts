@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+
 import { plainToInstance } from 'class-transformer';
 import { AuthTokenOutput } from 'src/auth/dtos/auth-token-output.dto';
 import { RequestContext } from 'src/shared/request-context/request-context.dto';
@@ -8,6 +8,7 @@ import { JwtSigningService } from 'src/shared/signing/jwt-signing.service';
 import { SMSClientRegisterInput } from '../dtos/sms-client-input.dto';
 import { SMSEventsGateway } from '../gateways/sms-events.gateway';
 import { SMSClientService } from './sms-client.service';
+import * as fs from 'fs';
 
 @Injectable()
 export class SMSAuthService {
@@ -67,5 +68,10 @@ export class SMSAuthService {
     return plainToInstance(AuthTokenOutput, authToken, {
       excludeExtraneousValues: true,
     });
+  }
+
+  async readVersion(): Promise<string> {
+    const t = fs.readFileSync('uploads/worker/version.txt', 'utf8');
+    return t ?? '';
   }
 }

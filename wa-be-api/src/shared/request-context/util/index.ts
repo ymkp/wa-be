@@ -24,10 +24,9 @@ export function createRequestContext(request: Request): RequestContext {
     : null;
 
   ctx.referer = request.header(REFERER) ? request.header(REFERER) : null;
-
   ctx.host = request.header(HOST) ? request.header(HOST) : null;
   // console.log(request.headers);
-
+  ctx.url = request.url;
   // If request.user does not exist, we explicitly set it to null.
   ctx.user = request.user
     ? plainToInstance(UserAccessTokenClaims, request.user, {
