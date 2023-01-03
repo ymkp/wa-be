@@ -183,7 +183,7 @@ export class UserController {
     await this.userService.editPassword(ctx, input);
   }
 
-  @Get('token/generate-whatsapp-for-me')
+  @Get('token/generate-wa-for-me')
   @ApiOperation({ summary: 'generate wa token for logged in user' })
   async generateWATokenForSelf(
     @ReqContext() ctx: RequestContext,
@@ -199,7 +199,7 @@ export class UserController {
     return await this.userService.generateSMSTokenForUser(ctx.user.id);
   }
 
-  @Get('token/generate-whatsapp-for-other/:userId')
+  @Get('token/generate-wa-for-other/:userId')
   @ApiOperation({
     summary:
       'generate wa token for other user. Only superadmin can do this operation',

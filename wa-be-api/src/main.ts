@@ -15,9 +15,9 @@ async function bootstrap() {
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
   // Uncomment these lines to use the Redis adapter:
-  const redisIoAdapter = new RedisIoAdapter(app);
-  await redisIoAdapter.connectToRedis();
-  app.useWebSocketAdapter(redisIoAdapter);
+  // const redisIoAdapter = new RedisIoAdapter(app);
+  // await redisIoAdapter.connectToRedis();
+  // app.useWebSocketAdapter(redisIoAdapter);
 
   const configService = app.get(ConfigService);
   const appPrefix = configService.get('prefix');

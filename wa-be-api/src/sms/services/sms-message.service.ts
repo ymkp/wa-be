@@ -123,6 +123,7 @@ export class SMSMessageService {
         client: {
           id: true,
           msisdn: true,
+          name: true,
         },
         contact: { id: true, msisdn: true },
         message: true,

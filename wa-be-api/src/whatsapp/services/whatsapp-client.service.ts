@@ -341,8 +341,8 @@ export class WhatsappCLientService implements OnModuleInit, OnModuleDestroy {
   private buildEnv(input: WhatsappWorkerCreateParameter): string {
     const beApiHookURL =
       this.configService.get('url') +
-      // ':' +
-      // this.configService.get('port') +
+      ':' +
+      this.configService.get('port') +
       this.configService.get('prefix') +
       '/whatsapp-hook';
     return `

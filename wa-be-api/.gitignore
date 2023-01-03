@@ -39,3 +39,6 @@ lerna-debug.log*
 
 # static files
 uploads/worker/*.apk
+
+#prometheus
+data/

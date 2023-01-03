@@ -6,6 +6,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { SmsModule } from './sms/sms.module';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SmsModule } from './sms/sms.module';
     AuthModule,
     UserModule,
     CacheModule.register(),
+    PrometheusModule.register(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
     }),
