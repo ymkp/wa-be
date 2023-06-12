@@ -396,7 +396,7 @@ func WhatsAppSendText(ctx context.Context, jid string, rjid string, message stri
 		}
 
 		// Send WhatsApp Message Proto
-		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgId, msgContent)
+		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgContent)
 		if err != nil {
 			return "", err
 		}
@@ -435,7 +435,7 @@ func WhatsAppSendLocation(ctx context.Context, jid string, rjid string, latitude
 		}
 
 		// Send WhatsApp Message Proto
-		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgId, msgContent)
+		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgContent)
 		if err != nil {
 			return "", err
 		}
@@ -487,7 +487,7 @@ func WhatsAppSendDocument(ctx context.Context, jid string, rjid string, fileByte
 		}
 
 		// Send WhatsApp Message Proto
-		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgId, msgContent)
+		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID,  msgContent)
 		if err != nil {
 			return "", err
 		}
@@ -606,7 +606,7 @@ func WhatsAppSendImage(ctx context.Context, jid string, rjid string, imageBytes 
 		}
 
 		// Send WhatsApp Message Proto
-		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgId, msgContent)
+		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID,  msgContent)
 		if err != nil {
 			return "", err
 		}
@@ -656,7 +656,7 @@ func WhatsAppSendAudio(ctx context.Context, jid string, rjid string, audioBytes 
 		}
 
 		// Send WhatsApp Message Proto
-		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgId, msgContent)
+		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID,  msgContent)
 		if err != nil {
 			return "", err
 		}
@@ -708,7 +708,7 @@ func WhatsAppSendVideo(ctx context.Context, jid string, rjid string, videoBytes 
 		}
 
 		// Send WhatsApp Message Proto
-		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgId, msgContent)
+		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID,  msgContent)
 		if err != nil {
 			return "", err
 		}
@@ -749,7 +749,7 @@ func WhatsAppSendContact(ctx context.Context, jid string, rjid string, contactNa
 		}
 
 		// Send WhatsApp Message Proto
-		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgId, msgContent)
+		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID,  msgContent)
 		if err != nil {
 			return "", err
 		}
@@ -802,7 +802,7 @@ func WhatsAppSendLink(ctx context.Context, jid string, rjid string, linkCaption 
 		}
 
 		// Send WhatsApp Message Proto
-		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgId, msgContent)
+		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID,  msgContent)
 		if err != nil {
 			return "", err
 		}
@@ -867,7 +867,7 @@ func WhatsAppSendSticker(ctx context.Context, jid string, rjid string, stickerBy
 		}
 
 		// Send WhatsApp Message Proto
-		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID, msgId, msgContent)
+		_, err = WhatsAppClient[jid].SendMessage(ctx, remoteJID,  msgContent)
 		if err != nil {
 			return "", err
 		}
