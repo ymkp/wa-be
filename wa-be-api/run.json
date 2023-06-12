@@ -1,1 +1,5 @@
-{"name": "wamin-api","script": "npm", "args": "run start"}
+{
+  "name": "wamin-api",
+  "script": "npm",
+  "args": "run start:prod"
+}
